@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>793</width>
+    <height>610</height>
+   </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Consolas</family>
+   </font>
+  </property>
+  <property name="windowTitle">
+   <string>Maze - bchen111</string>
+  </property>
+  <property name="locale">
+   <locale language="English" country="UnitedStates"/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+    <item>
+     <widget class="QWidget" name="widget_selectGenerateMethod" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="10,1,0,0">
+       <item>
+        <widget class="QComboBox" name="comboBox_selectGenerateMethod">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <item>
+          <property name="text">
+           <string>Recursive Backtracking</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Kruskal's Algorithm</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Prim's Algorithm</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Test</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_mazeSize">
+         <property name="text">
+          <string>Maze size</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QSpinBox" name="spinBox_mazeSize">
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+         <property name="buttonSymbols">
+          <enum>QAbstractSpinBox::NoButtons</enum>
+         </property>
+         <property name="minimum">
+          <number>5</number>
+         </property>
+         <property name="value">
+          <number>30</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_run">
+         <property name="font">
+          <font>
+           <pointsize>10</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Run</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget_mazeDisplay" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>400</width>
+        <height>400</height>
+       </size>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1">
+       <item>
+        <widget class="MazeDisplay" name="widget_mazeDisplayMain" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MazeDisplay</class>
+   <extends>QWidget</extends>
+   <header>MazeDisplay.h</header>
+   <container>1</container>
+   <slots>
+    <slot>generator_run()</slot>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>pushButton_run</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>mainFunc_generatorRun()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>617</x>
+     <y>43</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>787</x>
+     <y>64</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>mainFunc_generatorRun()</slot>
+  <slot>mainFunc_resetMaze()</slot>
+ </slots>
+</ui>
