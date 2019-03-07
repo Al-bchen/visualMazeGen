@@ -1,8 +1,9 @@
+# Different generator to generate the maze
 import random
 import time
 import threading
 
-from MazeData import MazeData, MazeBlockData, MazeBlockColor
+from MazeData import MazeData, MazeBlockData, MazeBlockColor, MazeDirection
 
 from PyQt5.QtWidgets import QWidget
 
@@ -12,17 +13,20 @@ class MazeGenerator():
 		self.mazeData = MazeData()
 		self.widget = QWidget()
 
-		# 0: not active/ 1: running/ 2: require to stop
-		self.generatorStopFlag = False
-		self.lock_setGeneratorStopFlag = threading.Lock()
-		self.lock_startGenerator = threading.Lock()
+		self.flag_stopGenerator = False	# Require to stop generator immediately, used before running a new generator
+		self.flag_skipPrinting = False	# Require to display final result immediately, not showing intermediate result
+		self.lock_startGenerator = threading.Lock()		# Limit that at most one generator is active
+		self.generatorMappingList = [self.generator_RecursiveBacktracking,
+									 self.generator_Kruskal,
+									 self.generator_Prim]	#Map index to generator
 
-	def setMaze(self, x):
+	def setMaze(self, x: MazeData):
 		self.mazeData = x	#shallow copy
-	def setWidget(self, x):
+
+	def setWidget(self, x: QWidget):
 		self.widget = x
 
-	def resetMaze(self, index):
+	def resetMaze(self, index: int):
 		if index < 10:
 			self.mazeData.initMaze_grey()
 		else:
@@ -30,34 +34,29 @@ class MazeGenerator():
 		self.widget.update()
 
 	def displayUpdate(self):
-		if self.generatorStopFlag == False:
-			time.sleep(0.004)
+		if self.flag_stopGenerator == False and self.flag_skipPrinting == False:
+			time.sleep(0.005)
 			self.widget.update()
 
-	def generator_selector(self, index, size):
-
-		with self.lock_setGeneratorStopFlag:
-			self.generatorStopFlag = True
-
-		# self.lock_setGeneratorStopFlag.acquire()
-		# self.generatorStopFlag = True
-		# self.lock_setGeneratorStopFlag.release()
+	def generatorCreateAndRun(self, index: int, size: int):
+		self.flag_stopGenerator = True
 
 		with self.lock_startGenerator: #Maxinum one active generator is allowed
-			# self.lock_startGenerator.acquire()
-			self.generatorStopFlag = False
+			#use with, it automatically acquire() at beginning and release() at the end
+			self.flag_stopGenerator = False
 			self.mazeData.size = size
 			self.resetMaze(index)
 			time.sleep(1)
-			if index == 0:
-				self.generator_RecursiveBacktracking()
-			elif index == 1:
-				self.generator_Kruskal()
-			elif index == 2:
-				self.generator_Prim()
-			else:
-				self.generator_Test()
-			# self.lock_startGenerator.release()
+
+			self.generatorMappingList[index]()	# Call function by index
+			# if index == 0:
+			# 	self.generator_RecursiveBacktracking()
+			# elif index == 1:
+			# 	self.generator_Kruskal()
+			# elif index == 2:
+			# 	self.generator_Prim()
+			# else:
+			# 	self.generator_Test()
 
 	def generator_Test(self):
 		self.mazeData.initMaze()
@@ -66,60 +65,56 @@ class MazeGenerator():
 		self.widget.update()
 
 	def generator_RecursiveBacktracking(self):
-		def recursive_helper(x,y,px,py):
-			#black: not visited
-			#cyan: is visiting
-			#white: already visited
-			if self.generatorStopFlag == True:
+		def recursive_helper(x,y,px,py):	# Helper function for depth first search
+			#grey: not visited / cyan: is visiting / dark cyan: the exact one is visiting / white: already visited
+			if self.flag_stopGenerator == True:
 				return
 
-			randomMappingList = MazeBlockData.mappingList()
-			random.shuffle(randomMappingList)
+			randomDeltaList = MazeDirection.deltaList()
+			random.shuffle(randomDeltaList)		# randomize direction selection
 
 			self.mazeData.block[x][y].color = MazeBlockColor.darkcyan
 			self.displayUpdate()
-			self.mazeData.block[x][y].color = MazeBlockColor.cyan
-			for each in randomMappingList:
-				nx = x+each[1][0]
-				ny = y+each[1][1]
-				if px == nx and py == ny:
+			self.mazeData.block[x][y].color = MazeBlockColor.cyan	# set vertex to visiting state
+			for (dir,(dx,dy)) in randomDeltaList:
+				nx = x + dx
+				ny = y + dy
+				if px == nx and py == ny:	# new vertex is parent vertex
 					continue
-				if nx < 0 or nx >= self.mazeData.size or ny < 0 or ny >=self.mazeData.size:
+				if nx < 0 or nx >= self.mazeData.size or ny < 0 or ny >=self.mazeData.size:	# new vertex is out of bound
 					continue
-				if self.mazeData.block[nx][ny].color != MazeBlockColor.grey and self.mazeData.block[nx][ny].border[MazeBlockData.oppositeDirection()[each[0]]] == True:
+				if self.mazeData.block[nx][ny].color != MazeBlockColor.grey:	# new vertex is already visited
 					continue
-				self.mazeData.block[x][y].border[each[0]] = False
-				self.mazeData.block[nx][ny].border[MazeBlockData.oppositeDirection()[each[0]]] = False
-				recursive_helper(nx, ny, x, y)
+				self.mazeData.block[x][y].border[dir] = False
+				self.mazeData.block[nx][ny].border[MazeDirection.oppositeDirDict()[dir]] = False
+				recursive_helper(nx, ny, x, y)	# add edge to maze and visit new vertex
 
-			self.mazeData.block[x][y].color = MazeBlockColor.white
+			self.mazeData.block[x][y].color = MazeBlockColor.white	# set vertex to fully visited state
 			self.displayUpdate()
 
 		recursive_helper(0,0,-1,-1)
 		self.displayUpdate()
 
 	def generator_Kruskal(self):
-		parentNode = [i for i in range(self.mazeData.size ** 2)]	#disjoint set
-		def findSetNum(x):
+		parentNode = [i for i in range(self.mazeData.size ** 2)]	#disjoint set, state of (x,y) saves to index (x + y * size)
+		def findSetNum(x):	#findSet for disjoint set
 			if parentNode[x] != x:
 				parentNode[x] = findSetNum(parentNode[x])
 			return parentNode[x]
 
-		mappingDict = dict(MazeBlockData.mappingList_noDuplicate())
+		deltaDict = MazeDirection.deltaDict_twoDir()
 		allEdges = []
 		for x in range(self.mazeData.size):
 			for y in range(self.mazeData.size):
-				allEdges = allEdges + [((x,y), each[0]) for each in mappingDict]
+				allEdges = allEdges + [((x,y), each[0]) for each in deltaDict]	#e.g. [((0,0),'d'),((0,0),'r'),((0,1),'d'), ...]
 
-		random.shuffle(allEdges)
+		random.shuffle(allEdges)	#Shuffle it, randomize selection
 
-		for e in allEdges:
-			if self.generatorStopFlag == True:
+		for ((x1,y1),dir) in allEdges:
+			if self.flag_stopGenerator == True:
 				break
-			x1 = e[0][0]
-			y1 = e[0][1]
-			x2 = e[0][0] + mappingDict[e[1]][0]
-			y2 = e[0][1] + mappingDict[e[1]][1]
+			x2 = x1 + deltaDict[dir][0]
+			y2 = y1 + deltaDict[dir][1]
 
 			if x2 < 0 or x2 >= self.mazeData.size or y2 < 0 or y2 >= self.mazeData.size:
 				continue
@@ -131,48 +126,34 @@ class MazeGenerator():
 			parentNode[set1] = set2
 
 			self.mazeData.block[x1][y1].color = MazeBlockColor.white
-			self.mazeData.block[x1][y1].border[e[1]] = False
+			self.mazeData.block[x1][y1].border[dir] = False
 			self.mazeData.block[x2][y2].color = MazeBlockColor.white
-			self.mazeData.block[x2][y2].border[MazeBlockData.oppositeDirection()[e[1]]] = False
+			self.mazeData.block[x2][y2].border[MazeDirection.oppositeDirDict()[dir]] = False
 			self.displayUpdate()
 
 	def generator_Prim(self):
-		mappingDict = MazeBlockData.mappingDict()
-		mappingList = MazeBlockData.mappingList()
-		adjacentVertice = [(0,0)]
-		adjacentVerticeDir = {(0,0): ''}
+		adjacentVerticeSet = {(0,0)}
+		randomDeltaList = MazeDirection.deltaList()
 
-		while len(adjacentVertice) > 0:
-			if self.generatorStopFlag == True:
+		while adjacentVerticeSet:	# set not empty
+			if self.flag_stopGenerator == True:
 				break
 
-			random.shuffle(adjacentVertice)
-			(x,y) = adjacentVertice.pop()
-			d = adjacentVerticeDir[(x,y)]
+			(x,y) = random.sample(adjacentVerticeSet, 1)[0]
+			adjacentVerticeSet.remove((x,y))	# random select one vertex and remove it
+
+			random.shuffle(randomDeltaList)		# randomize direction selection
+			for (dir, (dx,dy)) in randomDeltaList:
+				px = x + dx
+				py = y + dy
+				if px < 0 or px >= self.mazeData.size or py < 0 or py >=self.mazeData.size:	# new vertex is out of bound
+					continue
+				if self.mazeData.block[x][y].color != MazeBlockColor.white:
+					break
+
 			if self.mazeData.block[x][y].color == MazeBlockColor.white:
 				continue
 
-			self.mazeData.block[x][y].color = MazeBlockColor.white
-			if d != '':
-				px = x + mappingDict[d][0]
-				py = y + mappingDict[d][1]
-				self.mazeData.block[x][y].border[d] = False
-				self.mazeData.block[px][py].border[MazeBlockData.oppositeDirection()[d]] = False
-
-			for each in mappingList:
-				nx = x + each[1][0]
-				ny = y + each[1][1]
-				if nx < 0 or nx >= self.mazeData.size or ny < 0 or ny >=self.mazeData.size:
-					continue
-				if self.mazeData.block[nx][ny].color == MazeBlockColor.white:
-					continue
-				elif self.mazeData.block[nx][ny].color == MazeBlockColor.cyan:
-					if random.choice([True,False]) == True:
-						adjacentVerticeDir[(nx,ny)] = MazeBlockData.oppositeDirection()[each[0]]
-				elif self.mazeData.block[nx][ny].color == MazeBlockColor.grey:
-					self.mazeData.block[nx][ny].color = MazeBlockColor.cyan
-					adjacentVertice.append((nx,ny))
-					adjacentVerticeDir[(nx,ny)] = MazeBlockData.oppositeDirection()[each[0]]
 
 			self.displayUpdate()
 

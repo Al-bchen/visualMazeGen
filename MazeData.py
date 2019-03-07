@@ -5,7 +5,6 @@ class MazeBlockColor():
 	cyan = '#00ffff'
 	darkcyan = '#008080'
 
-
 class MazeBlockData():
 	def __init__(self):
 		# Border / Edge
@@ -18,19 +17,22 @@ class MazeBlockData():
 		# Text
 		self.text = ''
 
+class MazeDirection():
 	@staticmethod
-	def mappingDict():
-		return dict(MazeBlockData.mappingList())
-	@staticmethod
-	def mappingList():
+	def deltaList():
 		return [('u',(0,-1)), ('d',(0,1)), ('l',(-1,0)), ('r',(1,0))]
 	@staticmethod
-	def mappingList_noDuplicate():
+	def deltaDict():
+		return dict(MazeDirection.deltaList())
+	@staticmethod
+	def oppositeDirDict():
+		return {'u':'d', 'd':'u', 'l':'r', 'r':'l'}
+	@staticmethod
+	def deltaList_twoDir():
 		return [('d',(0,1)), ('r',(1,0))]
 	@staticmethod
-	def oppositeDirection():
-		return {'u':'d', 'd':'u', 'l':'r', 'r':'l'}
-
+	def deltaDict_twoDir():
+		return dict(MazeDirection.deltaList_twoDir())
 
 class MazeData():
 	def __init__(self):

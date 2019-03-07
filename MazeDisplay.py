@@ -1,12 +1,11 @@
-import random
+#Visual display of the maze
 import threading
-import time
 
 from MazeGenerator import MazeGenerator
 from MazeData import MazeData
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QPainter, QPen, QColor
+from PyQt5.QtGui import QPainter, QPen, QColor, QPaintEvent
 from PyQt5.QtCore import Qt
 
 
@@ -28,7 +27,7 @@ class MazeDisplay(QWidget):
 		self.marginY = (size.height() - self.displaySize) / 2
 		self.blockSize = self.displaySize // self.mazeData.size
 
-	def paintEvent(self, e):
+	def paintEvent(self, e: QPaintEvent):
 		qp = QPainter()
 		qp.begin(self)
 
@@ -44,12 +43,12 @@ class MazeDisplay(QWidget):
 		self.marginY = (size.height() - self.displaySize) / 2
 		self.blockSize = self.displaySize // self.mazeData.size
 
-	def drawMazeBorder(self, qp):
+	def drawMazeBorder(self, qp: QPainter):
 		qp.setPen(QPen(Qt.black, self.penSize, Qt.SolidLine))
 		qp.setBrush(QColor(255, 255, 255))
 		qp.drawRect(self.marginX, self.marginY, self.displaySize, self.displaySize)
 
-	def drawMazeBlocks(self, qp):
+	def drawMazeBlocks(self, qp: QPainter):
 		# draw block color
 		qp.setPen(QPen(Qt.black, 0, Qt.NoPen))
 		for x in range(self.mazeData.size):
@@ -58,7 +57,7 @@ class MazeDisplay(QWidget):
 				qp.drawRect(self.marginX + x * self.blockSize, self.marginY + y * self.blockSize, self.blockSize, self.blockSize)
 		# draw block text(unimplemented)
 
-		# drow block border/edge
+		# draw block border/edge
 		qp.setPen(QPen(Qt.black, self.penSize, Qt.SolidLine))
 		for x in range(self.mazeData.size):
 			for y in range(self.mazeData.size):
@@ -75,6 +74,6 @@ class MazeDisplay(QWidget):
 					qp.drawLine(self.marginX + (x + 1) * self.blockSize, self.marginY + y * self.blockSize,
 								self.marginX + (x + 1) * self.blockSize, self.marginY + (y + 1) * self.blockSize)
 
-	def generator_run(self, index, size):
-		th = threading.Thread(target = self.mazeGenerator.generator_selector, args=[index,size] ,daemon=True)
+	def runNewGenerator(self, index: int, size: int):
+		th = threading.Thread(target = self.mazeGenerator.generatorCreateAndRun, args=[index, size], daemon=True)
 		th.start()
