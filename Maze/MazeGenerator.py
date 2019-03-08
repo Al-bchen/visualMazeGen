@@ -3,8 +3,7 @@ import random
 import time
 import threading
 
-from MazeData import MazeData, MazeBlockData, MazeBlockColor, MazeDirection
-
+from Maze.MazeBase import *
 from PyQt5.QtWidgets import QWidget
 
 class MazeGenerator():
@@ -153,7 +152,6 @@ class MazeGenerator():
 
 			if self.mazeData.block[x][y].color == MazeBlockColor.white:
 				continue
-
 
 			self.displayUpdate()
 

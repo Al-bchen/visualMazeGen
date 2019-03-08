@@ -1,8 +1,8 @@
 #Visual display of the maze
 import threading
 
-from MazeGenerator import MazeGenerator
-from MazeData import MazeData
+from Maze import MazeGenerator
+from Maze.MazeBase import MazeData
 
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QPainter, QPen, QColor, QPaintEvent

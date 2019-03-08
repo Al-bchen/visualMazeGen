@@ -1,0 +1,1 @@
+from .MazeGenerator import MazeGenerator
