@@ -19,12 +19,26 @@ class MazeBlockData(object):
 		self.text = ''
 
 
-class MazeDirection(object):
-	deltaList = [('u', (0,-1)), ('d', (0,1)), ('l', (-1,0)), ('r', (1,0))]
-	deltaDict = dict(deltaList)
-	oppositeDirDict = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
-	deltaList_twoDir = [('d', (0,1)), ('r', (1,0))]
-	deltaDict_twoDir = dict(deltaList_twoDir)
+class MazeDirection():
+	@staticmethod
+	def getDeltaList():
+		return [('u', (0,-1)), ('d', (0,1)), ('l', (-1,0)), ('r', (1,0))]
+
+	@staticmethod
+	def getDeltaDict():
+		return dict(MazeDirection.getDeltaList())
+
+	@staticmethod
+	def getOppositeDirDict():
+		return {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
+
+	@staticmethod
+	def getDeltaList_twoDir():
+		return [('d',(0,1)), ('r',(1,0))]
+
+	@staticmethod
+	def getDeltaDict_twoDir():
+		return dict(MazeDirection.getDeltaList_twoDir())
 
 
 class MazeData(object):

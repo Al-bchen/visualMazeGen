@@ -39,21 +39,28 @@ class MazeGenerator(object):
 		return x < 0 or x >= self.mazeData.size or y < 0 or y >= self.mazeData.size
 
 	def displayUpdate(self):
-		if self.flag_stopGenerator == False and self.flag_skipPrinting == False:
+		if not self.flag_stopGenerator and not self.flag_skipPrinting:
 			time.sleep(0.005)
 			self.widget.update()
+
+	def finishGenerating(self):
+		self.widget.update()
+		if not self.flag_stopGenerator:
+			self.mazeData.isGenerated = True
 
 	def generatorCreateAndRun(self, index: int, size: int):
 		self.flag_stopGenerator = True
 
 		with self.lock_startGenerator:		# Maximum one active generator is allowed
-			# use with, it automatically acquire() at beginning and release() at the end
+			# use with, the lock automatically acquire() at beginning and release() at the end
 			self.flag_stopGenerator = False
 			self.flag_skipPrinting = False
 			self.mazeData.size = size
 			self.resetMaze(index)
 
-			self.generatorMappingList[index]()	# Call function by index
+			self.generatorMappingList[index]()		# Call function by index
+
+			self.finishGenerating()
 
 	def generator_Test(self):
 		self.mazeData.initMaze()
@@ -62,12 +69,12 @@ class MazeGenerator(object):
 		self.widget.update()
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
-		def recursive_helper(x,y,px,py):		# Helper function for DFS recursive calls
+		def recursive_helper(x, y, px, py):		# Helper function for DFS recursive calls
 			# grey: not visited / cyan: is visiting / dark cyan: the exact one is visiting / white: already visited
 			if self.flag_stopGenerator:
 				return
 
-			randomDeltaList = MazeDirection.deltaList
+			randomDeltaList = MazeDirection.getDeltaList()
 			random.shuffle(randomDeltaList)		# randomize direction selection
 
 			self.mazeData.block[x][y].color = MazeBlockColor.darkcyan		# set current vertex to exact visiting state
@@ -83,14 +90,13 @@ class MazeGenerator(object):
 				if self.mazeData.block[nx][ny].color != MazeBlockColor.grey:
 					continue
 				self.mazeData.block[x][y].border[dir] = False
-				self.mazeData.block[nx][ny].border[MazeDirection.oppositeDirDict[dir]] = False		# Add edge by removing walls
+				self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False		# Add edge by removing walls
 				recursive_helper(nx, ny, x, y)
 
 			self.mazeData.block[x][y].color = MazeBlockColor.white		# set vertex to fully visited state
 			self.displayUpdate()
 
 		recursive_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
-		self.displayUpdate()
 
 	def generator_Kruskal(self):		# generator using Kruskal's Algorithm with disjoint set
 		parentNode = [i for i in range(self.mazeData.size ** 2)]		# disjoint set, state of (x,y) saves to index (x + y * size)
@@ -104,17 +110,18 @@ class MazeGenerator(object):
 			parentNode[djs_find(x)] = djs_find(y)
 
 		allEdges = []
+		deltaDict = MazeDirection.getDeltaDict_twoDir()
 		for x in range(self.mazeData.size):
 			for y in range(self.mazeData.size):
-				allEdges = allEdges + [((x,y), each[0]) for each in MazeDirection.deltaDict_twoDir]		# e.g. [((0,0),'d'),((0,0),'r'),((0,1),'d'), ...]
+				allEdges = allEdges + [((x,y), each[0]) for each in deltaDict]		# e.g. [((0,0),'d'),((0,0),'r'),((0,1),'d'), ...]
 
 		random.shuffle(allEdges)		# Shuffle it, randomize selection
 
 		for ((x1, y1), dir) in allEdges:
 			if self.flag_stopGenerator:
 				break
-			x2 = x1 + MazeDirection.deltaDict[dir][0]
-			y2 = y1 + MazeDirection.deltaDict[dir][1]
+			x2 = x1 + deltaDict[dir][0]
+			y2 = y1 + deltaDict[dir][1]
 
 			if self.isOutbound(x2, y2):
 				continue
@@ -128,12 +135,12 @@ class MazeGenerator(object):
 			self.mazeData.block[x1][y1].color = MazeBlockColor.white
 			self.mazeData.block[x1][y1].border[dir] = False
 			self.mazeData.block[x2][y2].color = MazeBlockColor.white
-			self.mazeData.block[x2][y2].border[MazeDirection.oppositeDirDict[dir]] = False
+			self.mazeData.block[x2][y2].border[MazeDirection.getOppositeDirDict()[dir]] = False
 			self.displayUpdate()
 
 	def generator_Prim(self):
 		adjacentVerticesSet = {(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))}
-		randomDeltaList = MazeDirection.deltaList
+		randomDeltaList = MazeDirection.getDeltaList()
 		firstVertex = True
 
 		while adjacentVerticesSet:		# set not empty
@@ -152,12 +159,12 @@ class MazeGenerator(object):
 						continue
 					if self.mazeData.block[px][py].color == MazeBlockColor.white:
 						self.mazeData.block[x][y].border[dir] = False
-						self.mazeData.block[px][py].border[MazeDirection.oppositeDirDict[dir]] = False
+						self.mazeData.block[px][py].border[MazeDirection.getOppositeDirDict()[dir]] = False
 						break
 
 			firstVertex = False
 			self.mazeData.block[x][y].color = MazeBlockColor.white
-			for (ndir, (ndx, ndy)) in MazeDirection.deltaList:
+			for (ndir, (ndx, ndy)) in MazeDirection.getDeltaList():
 					nx = x + ndx
 					ny = y + ndy
 					if not self.isOutbound(nx, ny) and self.mazeData.block[nx][ny].color != MazeBlockColor.white:
@@ -165,5 +172,3 @@ class MazeGenerator(object):
 						adjacentVerticesSet.add((nx, ny))
 
 			self.displayUpdate()
-
-
