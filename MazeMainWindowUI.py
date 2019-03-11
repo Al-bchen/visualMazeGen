@@ -46,7 +46,7 @@ class Ui_MainWindow(object):
         self.spinBox_mazeSize.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.spinBox_mazeSize.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
         self.spinBox_mazeSize.setMinimum(5)
-        self.spinBox_mazeSize.setProperty("value", 30)
+        self.spinBox_mazeSize.setProperty("value", 20)
         self.spinBox_mazeSize.setObjectName("spinBox_mazeSize")
         self.horizontalLayout.addWidget(self.spinBox_mazeSize)
         self.pushButton_run = QtWidgets.QPushButton(self.widget_selectGenerateMethod)

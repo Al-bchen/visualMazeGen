@@ -1,11 +1,12 @@
-class MazeBlockColor():
+class MazeBlockColor(object):
 	white = '#ffffff'
 	black = '#000000'
 	grey = '#c0c0c0'
 	cyan = '#00ffff'
 	darkcyan = '#008080'
 
-class MazeBlockData():
+
+class MazeBlockData(object):
 	def __init__(self):
 		# Border / Edge
 		self.border = dict()
@@ -17,32 +18,27 @@ class MazeBlockData():
 		# Text
 		self.text = ''
 
-class MazeDirection():
-	@staticmethod
-	def deltaList():
-		return [('u',(0,-1)), ('d',(0,1)), ('l',(-1,0)), ('r',(1,0))]
-	@staticmethod
-	def deltaDict():
-		return dict(MazeDirection.deltaList())
-	@staticmethod
-	def oppositeDirDict():
-		return {'u':'d', 'd':'u', 'l':'r', 'r':'l'}
-	@staticmethod
-	def deltaList_twoDir():
-		return [('d',(0,1)), ('r',(1,0))]
-	@staticmethod
-	def deltaDict_twoDir():
-		return dict(MazeDirection.deltaList_twoDir())
 
-class MazeData():
+class MazeDirection(object):
+	deltaList = [('u', (0,-1)), ('d', (0,1)), ('l', (-1,0)), ('r', (1,0))]
+	deltaDict = dict(deltaList)
+	oppositeDirDict = {'u': 'd', 'd': 'u', 'l': 'r', 'r': 'l'}
+	deltaList_twoDir = [('d', (0,1)), ('r', (1,0))]
+	deltaDict_twoDir = dict(deltaList_twoDir)
+
+
+class MazeData(object):
 	def __init__(self):
-		self.size = 30
+		self.size = 5
+		self.isGenerated = False
+		self.block = []
 		self.initMaze()
 
 	def initMaze(self):
 		self.initMaze_grey()
 
 	def initMaze_grey(self):
+		self.isGenerated = False
 		self.block = [[MazeBlockData() for i in range(self.size)] for j in range(self.size)]
 		for x in range(self.size):
 			for y in range(self.size):
@@ -53,6 +49,7 @@ class MazeData():
 					= self.block[x][y].border['r'] = True
 
 	def initMaze_white(self):
+		self.isGenerated = False
 		self.block = [[MazeBlockData() for i in range(self.size)] for j in range(self.size)]
 		for i in range(self.size):
 			self.block[i][0].border['u'] = True

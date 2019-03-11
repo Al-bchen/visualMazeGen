@@ -1,4 +1,4 @@
-#Visual display of the maze
+# Visual display of the maze
 import threading
 
 from Maze import MazeGenerator

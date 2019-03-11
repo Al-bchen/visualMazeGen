@@ -11,10 +11,14 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 		super(MazeMainWindow, self).__init__()
 		self.setupUi(self)
 		self.centralwidget.parent().resize(1280, 800)
+		self.widget_mazeDisplayMain.mazeData.size = self.spinBox_mazeSize.value()
+		self.widget_mazeDisplayMain.mazeData.initMaze()
 
 	def mainFunc_generatorRun(self):
-		self.widget_mazeDisplayMain.runNewGenerator(self.comboBox_selectGenerateMethod.currentIndex(),
-													self.spinBox_mazeSize.value())
+		self.widget_mazeDisplayMain.runNewGenerator(
+			self.comboBox_selectGenerateMethod.currentIndex(),
+			self.spinBox_mazeSize.value())
+
 
 if __name__ == "__main__":
 	sys.setrecursionlimit(10000)
