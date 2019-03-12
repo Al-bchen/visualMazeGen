@@ -18,7 +18,9 @@ class MazeGenerator(object):
 		self.generatorMappingList = [
 			self.generator_RecursiveBacktracking,
 			self.generator_Kruskal,
-			self.generator_Prim] 	# Map index to generator
+			self.generator_Prim,
+			self.generator_HuntAndKill
+		] 	# Map index to generator
 
 	def setMaze(self, x: MazeData):
 		self.mazeData = x 	# shallow copy
@@ -172,3 +174,6 @@ class MazeGenerator(object):
 						adjacentVerticesSet.add((nx, ny))
 
 			self.displayUpdate()
+
+	def generator_HuntAndKill(self):
+		pass

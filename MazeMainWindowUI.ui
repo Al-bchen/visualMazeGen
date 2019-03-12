@@ -50,6 +50,11 @@
            <string>Prim's Algorithm</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Hunt And Kill</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>
