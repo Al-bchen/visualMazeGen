@@ -3,7 +3,8 @@ class MazeBlockColor(object):
 	black = '#000000'
 	grey = '#c0c0c0'
 	cyan = '#00ffff'
-	darkcyan = '#008080'
+	dark_cyan = '#008080'
+	green = '#77ff77'
 
 
 class MazeBlockData(object):
