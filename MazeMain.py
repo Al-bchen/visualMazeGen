@@ -10,7 +10,7 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		super(MazeMainWindow, self).__init__()
 		self.setupUi(self)
-		self.centralwidget.parent().resize(1280, 800)
+		self.centralwidget.parent().resize(800, 600)
 		self.widget_mazeDisplayMain.mazeData.size = self.spinBox_mazeSize.value()
 		self.widget_mazeDisplayMain.mazeData.initMaze()
 
