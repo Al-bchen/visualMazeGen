@@ -16,6 +16,7 @@ class MazeGenerator(object):
 		self.flag_stopGenerator = False		# Require to stop generator immediately, used before running a new generator
 		self.flag_skipPrinting = False		# Require to display final result immediately, not showing intermediate result
 		self.lock_startGenerator = threading.Lock()		# Limit that at most one generator is active
+		self.lock_modifyFlag_stopGenerator = threading.Lock()
 		self.generatorMappingList = [
 			self.generator_RecursiveBacktracking,
 			self.generator_Kruskal,
@@ -52,7 +53,11 @@ class MazeGenerator(object):
 			self.mazeData.isGenerated = True
 
 	def generatorCreateAndRun(self, index: int, size: int):
-		self.flag_stopGenerator = True
+
+		with self.lock_modifyFlag_stopGenerator:
+			if self.flag_stopGenerator:		# Limit that only one generator can run
+				return
+			self.flag_stopGenerator = True
 
 		with self.lock_startGenerator:		# Maximum one active generator is allowed
 			# use with, the lock automatically acquire() at beginning and release() at the end
@@ -64,6 +69,7 @@ class MazeGenerator(object):
 			self.generatorMappingList[index]()		# Call function by index
 
 			self.finishGenerating()
+		exit()
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
 		def recursive_helper(x, y, px, py):		# Helper function for DFS recursive calls
