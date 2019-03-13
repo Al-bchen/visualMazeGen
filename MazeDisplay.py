@@ -1,7 +1,6 @@
 # Visual display of the maze
 import threading
 
-from Maze import MazeGenerator
 from Maze.MazeBase import MazeData
 
 from PyQt5.QtWidgets import QWidget
@@ -10,7 +9,6 @@ from PyQt5.QtCore import Qt
 
 
 class MazeDisplay(QWidget):
-
 	def __init__(self, parent):
 		super(MazeDisplay, self).__init__(parent)
 
@@ -19,26 +17,24 @@ class MazeDisplay(QWidget):
 		self.mazeMargin = 10
 		self.penSize = 2
 		self.mazeData = MazeData()
-		self.mazeGenerator = MazeGenerator()
-		self.mazeGenerator.setMaze(self.mazeData)
-		self.mazeGenerator.setWidget(self)
 		self.displaySize = (min(size.height(), size.width()) - 2 * self.mazeMargin) // self.mazeData.size * self.mazeData.size
 		self.marginX = (size.width() - self.displaySize) / 2
 		self.marginY = (size.height() - self.displaySize) / 2
 		self.blockSize = self.displaySize // self.mazeData.size
 
-		self.lock_paintEvent = threading.Lock()
+		self.lock_maze = threading.Lock()
+	def update(self):
+		super(MazeDisplay, self).update(100,100,200,200)
 
 	def paintEvent(self, e: QPaintEvent):
-		if not self.lock_paintEvent.locked():
-			with self.lock_paintEvent:
-				qp = QPainter()
-				qp.begin(self)
+		with self.lock_maze:
+			qp = QPainter()
+			qp.begin(self)
 
-				self.setDisplaySize()
-				self.drawMazeBlocks(qp)
+			self.setDisplaySize()
+			self.drawMazeBlocks(qp)
 
-				qp.end()
+			qp.end()
 
 	def setDisplaySize(self):
 		size = self.size()
@@ -78,11 +74,6 @@ class MazeDisplay(QWidget):
 					if self.mazeData.block[x][y].border['r'] == True:
 						qp.drawLine(self.marginX + (x + 1) * self.blockSize, self.marginY + y * self.blockSize,
 									self.marginX + (x + 1) * self.blockSize, self.marginY + (y + 1) * self.blockSize)
-		except IndexError:		# IndexError means the mazeData is changed when printing, it's ok to ignore it
+		except Exception as e:		# IndexError means the mazeData is changed when printing, it's ok to ignore it
+			print(type(e))
 			pass
-
-	def runNewGenerator(self, index: int, size: int):
-		th = threading.Thread(target = self.mazeGenerator.generatorCreateAndRun, args=[index, size], daemon=True)
-		with self.lock_paintEvent:
-			pass
-		th.start()

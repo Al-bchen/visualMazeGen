@@ -43,10 +43,14 @@ class MazeDirection():
 
 
 class MazeData(object):
-	def __init__(self):
-		self.size = 5
+	def __init__(self, x=5):
+		self.size = x
 		self.isGenerated = False
 		self.block = []
+		self.initMaze()
+
+	def setSize(self, x: int):
+		self.size = x
 		self.initMaze()
 
 	def initMaze(self):

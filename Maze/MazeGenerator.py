@@ -5,13 +5,13 @@ import threading
 import copy
 
 from Maze.MazeBase import *
-from PyQt5.QtWidgets import QWidget
+from MazeDisplay import MazeDisplay
 
 class MazeGenerator(object):
 	def __init__(self):
 		super(MazeGenerator,self).__init__()
 		self.mazeData = MazeData()
-		self.widget = QWidget()
+		self.widget = MazeDisplay(None)
 
 		self.flag_stopGenerator = False		# Require to stop generator immediately, used before running a new generator
 		self.flag_skipPrinting = False		# Require to display final result immediately, not showing intermediate result
@@ -27,7 +27,7 @@ class MazeGenerator(object):
 	def setMaze(self, x: MazeData):
 		self.mazeData = x 	# shallow copy
 
-	def setWidget(self, x: QWidget):
+	def setWidget(self, x: MazeDisplay):
 		self.widget = x
 
 	def resetMaze(self, index: int):
@@ -35,9 +35,6 @@ class MazeGenerator(object):
 			self.mazeData.initMaze_grey()
 		else:
 			self.mazeData.initMaze_white()
-		time.sleep(0.05)
-		self.widget.update()
-		time.sleep(1)
 
 	def isOutOfBound(self, x, y):
 		return x < 0 or x >= self.mazeData.size or y < 0 or y >= self.mazeData.size
@@ -48,12 +45,11 @@ class MazeGenerator(object):
 			self.widget.update()
 
 	def finishGenerating(self):
-		self.widget.update()
 		if not self.flag_stopGenerator:
+			self.widget.repaint()		# require immediate repaint
 			self.mazeData.isGenerated = True
 
 	def generatorCreateAndRun(self, index: int, size: int):
-
 		with self.lock_modifyFlag_stopGenerator:
 			if self.flag_stopGenerator:		# Limit that only one generator can run
 				return
@@ -63,8 +59,12 @@ class MazeGenerator(object):
 			# use with, the lock automatically acquire() at beginning and release() at the end
 			self.flag_stopGenerator = False
 			self.flag_skipPrinting = False
-			self.mazeData.size = size
-			self.resetMaze(index)
+			with self.widget.lock_maze:
+				self.mazeData.size = size
+				self.resetMaze(index)
+
+			self.displayUpdate()
+			time.sleep(1)
 
 			self.generatorMappingList[index]()		# Call function by index
 
