@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import threading
 
 from MazeMainWindowUI import Ui_MainWindow
 
@@ -22,6 +23,7 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 
 if __name__ == "__main__":
 	sys.setrecursionlimit(10000)
+	threading.stack_size(128*1024*1024)
 	app = QApplication(sys.argv)
 	label = MazeMainWindow()
 	label.show()
