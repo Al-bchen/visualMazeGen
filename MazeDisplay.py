@@ -23,8 +23,6 @@ class MazeDisplay(QWidget):
 		self.blockSize = self.displaySize // self.mazeData.size
 
 		self.lock_maze = threading.Lock()
-	def update(self):
-		super(MazeDisplay, self).update(100,100,200,200)
 
 	def paintEvent(self, e: QPaintEvent):
 		with self.lock_maze:
