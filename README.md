@@ -41,7 +41,13 @@ On progress...
 
 ### Program Design
 - Only update the display of the updated part, instead of repaint all graph
-- Put Class MazeGenerator out of MazeDisplay
+  - Improve display effect
+- Watch generation step by step
 
 ## Known Bug
 None 
+
+## References
+
+https://www.jamisbuck.org/mazes/  
+http://www.astrolog.org/labyrnth/algrithm.htm

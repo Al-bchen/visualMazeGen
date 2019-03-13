@@ -5,13 +5,13 @@ import threading
 import copy
 
 from Maze.MazeBase import *
-from PyQt5.QtWidgets import QWidget
+from MazeDisplay import MazeDisplay
 
 class MazeGenerator(object):
 	def __init__(self):
 		super(MazeGenerator,self).__init__()
 		self.mazeData = MazeData()
-		self.widget = QWidget()
+		self.widget = MazeDisplay(None)
 
 		self.flag_stopGenerator = False		# Require to stop generator immediately, used before running a new generator
 		self.flag_skipPrinting = False		# Require to display final result immediately, not showing intermediate result
@@ -21,23 +21,21 @@ class MazeGenerator(object):
 			self.generator_RecursiveBacktracking,
 			self.generator_Kruskal,
 			self.generator_Prim,
-			self.generator_HuntAndKill
+			self.generator_HuntAndKill,
+			self.generator_RecursiveDivision
 		] 	# Map index to generator
 
 	def setMaze(self, x: MazeData):
 		self.mazeData = x 	# shallow copy
 
-	def setWidget(self, x: QWidget):
+	def setWidget(self, x: MazeDisplay):
 		self.widget = x
 
 	def resetMaze(self, index: int):
-		if index < 10:
+		if self.generatorMappingList[index] != self.generator_RecursiveDivision:
 			self.mazeData.initMaze_grey()
 		else:
 			self.mazeData.initMaze_white()
-		time.sleep(0.05)
-		self.widget.update()
-		time.sleep(1)
 
 	def isOutOfBound(self, x, y):
 		return x < 0 or x >= self.mazeData.size or y < 0 or y >= self.mazeData.size
@@ -48,12 +46,11 @@ class MazeGenerator(object):
 			self.widget.update()
 
 	def finishGenerating(self):
-		self.widget.update()
 		if not self.flag_stopGenerator:
+			self.widget.update()		# require immediate repaint
 			self.mazeData.isGenerated = True
 
 	def generatorCreateAndRun(self, index: int, size: int):
-
 		with self.lock_modifyFlag_stopGenerator:
 			if self.flag_stopGenerator:		# Limit that only one generator can run
 				return
@@ -63,8 +60,12 @@ class MazeGenerator(object):
 			# use with, the lock automatically acquire() at beginning and release() at the end
 			self.flag_stopGenerator = False
 			self.flag_skipPrinting = False
-			self.mazeData.size = size
-			self.resetMaze(index)
+			with self.widget.lock_maze:
+				self.mazeData.size = size
+				self.resetMaze(index)
+
+			self.displayUpdate()
+			time.sleep(1)
 
 			self.generatorMappingList[index]()		# Call function by index
 
@@ -72,7 +73,7 @@ class MazeGenerator(object):
 		return
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
-		def recursive_helper(x, y, px, py):		# Helper function for DFS recursive calls
+		def recursivebacktracking_dfs_helper(x, y, px, py):		# Helper function for DFS recursive calls
 			# grey: not visited / cyan: is visiting / dark cyan: the exact one is visiting / white: already visited
 			if self.flag_stopGenerator:
 				return
@@ -94,12 +95,12 @@ class MazeGenerator(object):
 					continue
 				self.mazeData.block[x][y].border[dir] = False
 				self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False		# Add edge by removing walls
-				recursive_helper(nx, ny, x, y)
+				recursivebacktracking_dfs_helper(nx, ny, x, y)
 
 			self.mazeData.block[x][y].color = MazeBlockColor.white		# set vertex to fully visited state
 			self.displayUpdate()
 
-		recursive_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
+		recursivebacktracking_dfs_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
 
 	def generator_Kruskal(self):		# generator using Kruskal's Algorithm with disjoint set
 		parentNode = [i for i in range(self.mazeData.size ** 2)]		# disjoint set, state of (x,y) saves to index (x + y * size)
@@ -141,7 +142,7 @@ class MazeGenerator(object):
 			self.mazeData.block[x2][y2].border[MazeDirection.getOppositeDirDict()[dir]] = False
 			self.displayUpdate()
 
-	def generator_Prim(self):
+	def generator_Prim(self):		# generator using Prim's Algorithm
 		adjacentVerticesSet = {(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))}
 		randomDeltaList = MazeDirection.getDeltaList()
 		firstVertex = True
@@ -176,7 +177,7 @@ class MazeGenerator(object):
 
 			self.displayUpdate()
 
-	def generator_HuntAndKill(self):
+	def generator_HuntAndKill(self):		# generator using Hunt Ant Kill
 		def huntandkill_iterate_helper(x, y):
 			while True:
 				if self.flag_stopGenerator:
@@ -257,3 +258,6 @@ class MazeGenerator(object):
 				huntandkill_iterate_helper(x, y)
 			except TypeError:
 				break
+
+	def generator_RecursiveDivision(self):		# generator using Recursive Division
+		pass
