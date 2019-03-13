@@ -2,6 +2,7 @@
 import random
 import time
 import threading
+import copy
 
 from Maze.MazeBase import *
 from PyQt5.QtWidgets import QWidget
@@ -37,12 +38,12 @@ class MazeGenerator(object):
 		self.widget.update()
 		time.sleep(1)
 
-	def isOutbound(self, x, y):
+	def isOutOfBound(self, x, y):
 		return x < 0 or x >= self.mazeData.size or y < 0 or y >= self.mazeData.size
 
 	def displayUpdate(self):
 		if not self.flag_stopGenerator and not self.flag_skipPrinting:
-			time.sleep(0.005)
+			time.sleep(0.01)
 			self.widget.update()
 
 	def finishGenerating(self):
@@ -64,12 +65,6 @@ class MazeGenerator(object):
 
 			self.finishGenerating()
 
-	def generator_Test(self):
-		self.mazeData.initMaze()
-		self.mazeData.block[1][1].color = MazeBlockColor.white
-		self.mazeData.block[2][2].border['r'] = True
-		self.widget.update()
-
 	def generator_RecursiveBacktracking(self):		# generator using DFS
 		def recursive_helper(x, y, px, py):		# Helper function for DFS recursive calls
 			# grey: not visited / cyan: is visiting / dark cyan: the exact one is visiting / white: already visited
@@ -79,7 +74,7 @@ class MazeGenerator(object):
 			randomDeltaList = MazeDirection.getDeltaList()
 			random.shuffle(randomDeltaList)		# randomize direction selection
 
-			self.mazeData.block[x][y].color = MazeBlockColor.darkcyan		# set current vertex to exact visiting state
+			self.mazeData.block[x][y].color = MazeBlockColor.dark_cyan		# set current vertex to exact visiting state
 			self.displayUpdate()
 			self.mazeData.block[x][y].color = MazeBlockColor.cyan		# set vertex to visiting state
 			for (dir, (dx,dy)) in randomDeltaList:
@@ -87,7 +82,7 @@ class MazeGenerator(object):
 				ny = y + dy
 				if px == nx and py == ny:
 					continue
-				if self.isOutbound(nx, ny):
+				if self.isOutOfBound(nx, ny):
 					continue
 				if self.mazeData.block[nx][ny].color != MazeBlockColor.grey:
 					continue
@@ -125,7 +120,7 @@ class MazeGenerator(object):
 			x2 = x1 + deltaDict[dir][0]
 			y2 = y1 + deltaDict[dir][1]
 
-			if self.isOutbound(x2, y2):
+			if self.isOutOfBound(x2, y2):
 				continue
 
 			set1 = djs_find(x1 + y1 * self.mazeData.size)
@@ -157,7 +152,7 @@ class MazeGenerator(object):
 				for (dir, (dx, dy)) in randomDeltaList:
 					px = x + dx
 					py = y + dy
-					if self.isOutbound(px, py):
+					if self.isOutOfBound(px, py):
 						continue
 					if self.mazeData.block[px][py].color == MazeBlockColor.white:
 						self.mazeData.block[x][y].border[dir] = False
@@ -169,11 +164,90 @@ class MazeGenerator(object):
 			for (ndir, (ndx, ndy)) in MazeDirection.getDeltaList():
 					nx = x + ndx
 					ny = y + ndy
-					if not self.isOutbound(nx, ny) and self.mazeData.block[nx][ny].color != MazeBlockColor.white:
+					if not self.isOutOfBound(nx, ny) and self.mazeData.block[nx][ny].color != MazeBlockColor.white:
 						self.mazeData.block[nx][ny].color = MazeBlockColor.cyan
 						adjacentVerticesSet.add((nx, ny))
 
 			self.displayUpdate()
 
 	def generator_HuntAndKill(self):
-		pass
+		def huntandkill_iterate_helper(x, y):
+			while True:
+				if self.flag_stopGenerator:
+					return
+
+				randomDeltaList = MazeDirection.getDeltaList()
+				random.shuffle(randomDeltaList)		# randomize direction selection
+
+				self.mazeData.block[x][y].color = MazeBlockColor.dark_cyan		# set current vertex to exact visiting state
+				self.displayUpdate()
+				self.mazeData.block[x][y].color = MazeBlockColor.cyan		# set vertex to visiting state
+
+				flag_deadend = True
+				for (dir, (dx,dy)) in randomDeltaList:
+					nx = x + dx
+					ny = y + dy
+					if self.isOutOfBound(nx, ny):
+						continue
+					if self.mazeData.block[nx][ny].color != MazeBlockColor.grey:
+						continue
+					self.mazeData.block[x][y].border[dir] = False
+					self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False		# Add edge by removing walls
+					x = nx
+					y = ny
+					flag_deadend = False
+					break
+
+				if flag_deadend:
+					break
+
+			for x in range(self.mazeData.size):
+				for y in range(self.mazeData.size):
+					if self.mazeData.block[x][y].color == MazeBlockColor.cyan:
+						self.mazeData.block[x][y].color = MazeBlockColor.white
+			self.displayUpdate()
+
+		def huntandkill_scan_and_add_adjacent():		# scan(hunt) for the first unvisited vertex and add edge with adjacent visited vertex
+			ret = None
+			for x in range(self.mazeData.size):
+				if ret:
+					break
+				if self.flag_stopGenerator:
+					return None
+				saved_column = copy.deepcopy(self.mazeData.block[x])		# save state
+				for y in range(self.mazeData.size):
+					self.mazeData.block[x][y].color = MazeBlockColor.green
+				self.displayUpdate()
+				self.mazeData.block[x] = saved_column		# restore state
+
+				for y in range(self.mazeData.size):
+					if ret:
+						break
+					if self.flag_stopGenerator:
+						return None
+					if self.mazeData.block[x][y].color == MazeBlockColor.grey:
+						randomDeltaList = MazeDirection.getDeltaList()
+						random.shuffle(randomDeltaList)
+						for (dir, (dx, dy)) in randomDeltaList:
+							nx = x + dx
+							ny = y + dy
+							if self.isOutOfBound(nx, ny):
+								continue
+							if self.mazeData.block[nx][ny].color == MazeBlockColor.white:
+								self.mazeData.block[x][y].border[dir] = False
+								self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False
+								ret = (x, y)		# found, assign return value and ready to return
+								break
+
+			self.displayUpdate()
+			return ret
+
+		huntandkill_iterate_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))
+		while True:
+			if self.flag_stopGenerator:
+				return
+			try:
+				(x, y) = huntandkill_scan_and_add_adjacent()
+				huntandkill_iterate_helper(x, y)
+			except TypeError:
+				break
