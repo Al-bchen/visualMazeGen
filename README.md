@@ -42,6 +42,7 @@ On progress...
 ### Program Design
 - Only update the display of the updated part, instead of repaint all graph
   - Improve display effect
+- Watch generation step by step
 
 ## Known Bug
 None 

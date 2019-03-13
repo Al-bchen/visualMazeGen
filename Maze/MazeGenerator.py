@@ -32,7 +32,7 @@ class MazeGenerator(object):
 		self.widget = x
 
 	def resetMaze(self, index: int):
-		if index < 10:
+		if self.generatorMappingList[index] != self.generator_RecursiveDivision:
 			self.mazeData.initMaze_grey()
 		else:
 			self.mazeData.initMaze_white()
@@ -73,7 +73,7 @@ class MazeGenerator(object):
 		return
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
-		def recursive_helper(x, y, px, py):		# Helper function for DFS recursive calls
+		def recursivebacktracking_dfs_helper(x, y, px, py):		# Helper function for DFS recursive calls
 			# grey: not visited / cyan: is visiting / dark cyan: the exact one is visiting / white: already visited
 			if self.flag_stopGenerator:
 				return
@@ -95,12 +95,12 @@ class MazeGenerator(object):
 					continue
 				self.mazeData.block[x][y].border[dir] = False
 				self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False		# Add edge by removing walls
-				recursive_helper(nx, ny, x, y)
+				recursivebacktracking_dfs_helper(nx, ny, x, y)
 
 			self.mazeData.block[x][y].color = MazeBlockColor.white		# set vertex to fully visited state
 			self.displayUpdate()
 
-		recursive_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
+		recursivebacktracking_dfs_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
 
 	def generator_Kruskal(self):		# generator using Kruskal's Algorithm with disjoint set
 		parentNode = [i for i in range(self.mazeData.size ** 2)]		# disjoint set, state of (x,y) saves to index (x + y * size)
@@ -142,7 +142,7 @@ class MazeGenerator(object):
 			self.mazeData.block[x2][y2].border[MazeDirection.getOppositeDirDict()[dir]] = False
 			self.displayUpdate()
 
-	def generator_Prim(self):
+	def generator_Prim(self):		# generator using Prim's Algorithm
 		adjacentVerticesSet = {(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))}
 		randomDeltaList = MazeDirection.getDeltaList()
 		firstVertex = True
@@ -177,7 +177,7 @@ class MazeGenerator(object):
 
 			self.displayUpdate()
 
-	def generator_HuntAndKill(self):
+	def generator_HuntAndKill(self):		# generator using Hunt Ant Kill
 		def huntandkill_iterate_helper(x, y):
 			while True:
 				if self.flag_stopGenerator:
@@ -259,5 +259,5 @@ class MazeGenerator(object):
 			except TypeError:
 				break
 
-	def generator_RecursiveDivision(self):
+	def generator_RecursiveDivision(self):		# generator using Recursive Division
 		pass

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>793</width>
-    <height>610</height>
+    <width>745</width>
+    <height>681</height>
    </rect>
   </property>
   <property name="font">
@@ -25,10 +25,10 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
     <item>
-     <widget class="QWidget" name="widget_selectGenerateMethod" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout" stretch="100,1,1,1">
+     <widget class="QWidget" name="widget_generatorMethod" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout" stretch="100,1">
        <item>
-        <widget class="QComboBox" name="comboBox_selectGenerateMethod">
+        <widget class="QComboBox" name="comboBox_generatorMethod">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -63,36 +63,103 @@
         </widget>
        </item>
        <item>
-        <widget class="QLabel" name="label_mazeSize">
-         <property name="text">
-          <string>Maze size(5-50)</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QSpinBox" name="spinBox_mazeSize">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-         <property name="buttonSymbols">
-          <enum>QAbstractSpinBox::NoButtons</enum>
-         </property>
-         <property name="minimum">
-          <number>5</number>
-         </property>
-         <property name="maximum">
-          <number>50</number>
-         </property>
-         <property name="value">
-          <number>20</number>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_generatorRun">
-         <property name="text">
-          <string>Run</string>
-         </property>
+        <widget class="QWidget" name="widget_generatorConfig" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QWidget" name="widget_generatorSize" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,1">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_mazeSize">
+               <property name="text">
+                <string>Maze size(5-50)</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="spinBox_mazeSize">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="buttonSymbols">
+                <enum>QAbstractSpinBox::NoButtons</enum>
+               </property>
+               <property name="minimum">
+                <number>5</number>
+               </property>
+               <property name="maximum">
+                <number>50</number>
+               </property>
+               <property name="value">
+                <number>20</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QWidget" name="widget_generatorPushButton" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+             <property name="spacing">
+              <number>7</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="pushButton_generatorStep">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>Step</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_generatorRun">
+               <property name="text">
+                <string>Run</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -108,7 +175,9 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1">
        <item>
-        <widget class="MazeDisplay" name="widget_mazeDisplayMain" native="true"/>
+        <widget class="MazeDisplay" name="widget_mazeDisplayMain" native="true">
+         <zorder>widget_generatorMethod</zorder>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -116,7 +185,7 @@
     <item>
      <layout class="QHBoxLayout" name="widget_selectSolveMethod" stretch="100,1">
       <item>
-       <widget class="QComboBox" name="comboBox_seleveSolveMethod">
+       <widget class="QComboBox" name="comboBox_solverMethod">
         <property name="enabled">
          <bool>false</bool>
         </property>
@@ -182,12 +251,12 @@
    <slot>mainFunc_generatorRun()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>617</x>
-     <y>43</y>
+     <x>651</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
-     <x>787</x>
-     <y>64</y>
+     <x>695</x>
+     <y>114</y>
     </hint>
    </hints>
   </connection>
