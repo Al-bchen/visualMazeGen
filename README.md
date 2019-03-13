@@ -6,8 +6,8 @@ Visualization on different algorithms of maze generation
 ### Generator
 - Depth First Search / Recursive Backtracking
 - Minimum Spanning Tree
-  - Kruskal's Algorithm
-  - Prim's Algorithm (simplified)
+  - Kruskal's Algorithm (same edge weight)
+  - Prim's Algorithm (same edge weight)
 - Hunt And Kill
 
 ### Solver
@@ -17,13 +17,16 @@ On progress...
 
 ### Generator
 - Recursive Division
-- Growing Tree
 
 ###### Generator that is not going to be implemeted first
+>Kruskal's Algorithm (random edge weight)  
 >Prim's Algorithm (random edge weight)  
+>Eller's Algorithm  
 >Aldous-Broder Algorithm  
 >Wilson's Algorithm  
->Binary Tree Algorithm
+>Binary Tree Algorithm  
+>Growing Tree  
+>Growing Forest
 
 ### Parallel Generator
 - Depth First Search / Recursive Backtracking
