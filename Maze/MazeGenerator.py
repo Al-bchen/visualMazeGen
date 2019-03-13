@@ -21,7 +21,8 @@ class MazeGenerator(object):
 			self.generator_RecursiveBacktracking,
 			self.generator_Kruskal,
 			self.generator_Prim,
-			self.generator_HuntAndKill
+			self.generator_HuntAndKill,
+			self.generator_RecursiveDivision
 		] 	# Map index to generator
 
 	def setMaze(self, x: MazeData):
@@ -46,7 +47,7 @@ class MazeGenerator(object):
 
 	def finishGenerating(self):
 		if not self.flag_stopGenerator:
-			self.widget.repaint()		# require immediate repaint
+			self.widget.update()		# require immediate repaint
 			self.mazeData.isGenerated = True
 
 	def generatorCreateAndRun(self, index: int, size: int):
@@ -257,3 +258,6 @@ class MazeGenerator(object):
 				huntandkill_iterate_helper(x, y)
 			except TypeError:
 				break
+
+	def generator_RecursiveDivision(self):
+		pass

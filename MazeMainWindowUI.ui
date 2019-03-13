@@ -37,7 +37,7 @@
          </property>
          <item>
           <property name="text">
-           <string>Generator - Recursive Backtracking</string>
+           <string>Recursive Backtracking / Depth First Search</string>
           </property>
          </item>
          <item>
@@ -55,12 +55,17 @@
            <string>Hunt And Kill</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Recursive Division</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_mazeSize">
          <property name="text">
-          <string>Maze size</string>
+          <string>Maze size(5-50)</string>
          </property>
         </widget>
        </item>
@@ -74,6 +79,9 @@
          </property>
          <property name="minimum">
           <number>5</number>
+         </property>
+         <property name="maximum">
+          <number>50</number>
          </property>
          <property name="value">
           <number>20</number>
@@ -109,9 +117,12 @@
      <layout class="QHBoxLayout" name="widget_selectSolveMethod" stretch="100,1">
       <item>
        <widget class="QComboBox" name="comboBox_seleveSolveMethod">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <item>
          <property name="text">
-          <string>Solver - Depth First Search</string>
+          <string>Depth First Search</string>
          </property>
         </item>
         <item>
@@ -133,6 +144,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_solverRun">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Run</string>
         </property>
@@ -142,7 +156,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QStatusBar" name="statusbar">
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
