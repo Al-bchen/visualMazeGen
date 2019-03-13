@@ -69,7 +69,7 @@ class MazeGenerator(object):
 			self.generatorMappingList[index]()		# Call function by index
 
 			self.finishGenerating()
-		exit()
+		return
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
 		def recursive_helper(x, y, px, py):		# Helper function for DFS recursive calls
