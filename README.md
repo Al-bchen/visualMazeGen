@@ -41,7 +41,9 @@ On progress...
 
 ### Program Design
 - Only update the display of the updated part, instead of repaint all graph
-- Put Class MazeGenerator out of MazeDisplay
+  - Improve display effect
+- Rewrite class dependence
+  - Put Class MazeGenerator out of MazeDisplay
 
 ## Known Bug
 None 
