@@ -9,14 +9,18 @@ Visualization on different algorithms of maze generation
   - Kruskal's Algorithm (same edge weight)
   - Prim's Algorithm (same edge weight)
 - Hunt And Kill
+- Recursive Division
 
 ### Solver
 On progress...
 
+### Program Design
+Watch generation step by step
+
 ## Future Plan
 
 ### Generator
-- Recursive Division
+- None
 
 ###### Generator that is not going to be implemeted first
 >Kruskal's Algorithm (random edge weight)  
@@ -42,7 +46,6 @@ On progress...
 ### Program Design
 - Only update the display of the updated part, instead of repaint all graph
   - Improve display effect
-- Watch generation step by step
 
 ## Known Bug
 None 
