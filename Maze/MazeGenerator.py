@@ -37,7 +37,7 @@ class MazeGenerator(object):
 		else:
 			self.mazeData.initMaze_white()
 
-	def isOutOfBound(self, x, y):
+	def isOutOfMaze(self, x, y):
 		return x < 0 or x >= self.mazeData.size or y < 0 or y >= self.mazeData.size
 
 	def displayUpdate(self):
@@ -89,7 +89,7 @@ class MazeGenerator(object):
 				ny = y + dy
 				if px == nx and py == ny:
 					continue
-				if self.isOutOfBound(nx, ny):
+				if self.isOutOfMaze(nx, ny):
 					continue
 				if self.mazeData.block[nx][ny].color != MazeBlockColor.grey:
 					continue
@@ -127,7 +127,7 @@ class MazeGenerator(object):
 			x2 = x1 + deltaDict[dir][0]
 			y2 = y1 + deltaDict[dir][1]
 
-			if self.isOutOfBound(x2, y2):
+			if self.isOutOfMaze(x2, y2):
 				continue
 
 			set1 = djs_find(x1 + y1 * self.mazeData.size)
@@ -159,7 +159,7 @@ class MazeGenerator(object):
 				for (dir, (dx, dy)) in randomDeltaList:
 					px = x + dx
 					py = y + dy
-					if self.isOutOfBound(px, py):
+					if self.isOutOfMaze(px, py):
 						continue
 					if self.mazeData.block[px][py].color == MazeBlockColor.white:
 						self.mazeData.block[x][y].border[dir] = False
@@ -171,7 +171,7 @@ class MazeGenerator(object):
 			for (ndir, (ndx, ndy)) in MazeDirection.getDeltaList():
 					nx = x + ndx
 					ny = y + ndy
-					if not self.isOutOfBound(nx, ny) and self.mazeData.block[nx][ny].color != MazeBlockColor.white:
+					if not self.isOutOfMaze(nx, ny) and self.mazeData.block[nx][ny].color != MazeBlockColor.white:
 						self.mazeData.block[nx][ny].color = MazeBlockColor.cyan
 						adjacentVerticesSet.add((nx, ny))
 
@@ -194,7 +194,7 @@ class MazeGenerator(object):
 				for (dir, (dx,dy)) in randomDeltaList:
 					nx = x + dx
 					ny = y + dy
-					if self.isOutOfBound(nx, ny):
+					if self.isOutOfMaze(nx, ny):
 						continue
 					if self.mazeData.block[nx][ny].color != MazeBlockColor.grey:
 						continue
@@ -238,7 +238,7 @@ class MazeGenerator(object):
 						for (dir, (dx, dy)) in randomDeltaList:
 							nx = x + dx
 							ny = y + dy
-							if self.isOutOfBound(nx, ny):
+							if self.isOutOfMaze(nx, ny):
 								continue
 							if self.mazeData.block[nx][ny].color == MazeBlockColor.white:
 								self.mazeData.block[x][y].border[dir] = False
@@ -260,4 +260,46 @@ class MazeGenerator(object):
 				break
 
 	def generator_RecursiveDivision(self):		# generator using Recursive Division
-		pass
+		def recursivedivision_helper(x1, y1, x2, y2):
+			width = x2 - x1 + 1
+			height = y2 - y1 + 1
+			if width < 2 or height < 2:
+				return
+			randomnumber = random.randint(1, width + height)
+			if randomnumber <= width:		# vertical wall
+				wallx = x1 + random.randint(0, width - 2)
+				wally = y1
+				passx = wallx
+				passy = wally + random.randint(0, height - 1)
+				dx = 0
+				dy = 1
+				wlen = height
+				dir = 'r'
+			else:		# horizontal wall
+				wallx = x1
+				wally = y1 + random.randint(0, height - 2)
+				passx = wallx + random.randint(0, width - 1)
+				passy = wally
+				dx = 1
+				dy = 0
+				wlen = width
+				dir = 'd'
+			x = wallx
+			y = wally
+			for i in range(wlen):
+				self.mazeData.block[x][y].border[dir] = True
+				self.mazeData.block[x+dy][y+dx].border[MazeDirection.getOppositeDirDict()[dir]] = True
+				x = x + dx
+				y = y + dy
+			self.displayUpdate()
+			self.mazeData.block[passx][passy].border[dir] = False
+			self.mazeData.block[passx+dy][passy+dx].border[MazeDirection.getOppositeDirDict()[dir]] = False
+			self.displayUpdate()
+			if randomnumber <= width:		# vertical wall
+				recursivedivision_helper(x1, y1, wallx, y2)
+				recursivedivision_helper(wallx+1, y1, x2, y2)
+			else:
+				recursivedivision_helper(x1, y1, x2, wally)
+				recursivedivision_helper(x1, wally+1, x2, y2)
+
+		recursivedivision_helper(0, 0, self.mazeData.size-1, self.mazeData.size-1)
