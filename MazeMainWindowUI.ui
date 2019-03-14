@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>745</width>
-    <height>681</height>
+    <width>1278</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="font">
@@ -123,7 +123,7 @@
           </item>
           <item>
            <widget class="QWidget" name="widget_generatorPushButton" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1">
+            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,1">
              <property name="spacing">
               <number>7</number>
              </property>
@@ -140,9 +140,16 @@
               <number>0</number>
              </property>
              <item>
+              <widget class="QPushButton" name="pushButton_generatorReset">
+               <property name="text">
+                <string>Reset</string>
+               </property>
+              </widget>
+             </item>
+             <item>
               <widget class="QPushButton" name="pushButton_generatorStep">
                <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
                <property name="text">
                 <string>Step</string>
@@ -175,9 +182,7 @@
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1">
        <item>
-        <widget class="MazeDisplay" name="widget_mazeDisplayMain" native="true">
-         <zorder>widget_generatorMethod</zorder>
-        </widget>
+        <widget class="MazeDisplay" name="widget_mazeDisplayMain" native="true"/>
        </item>
       </layout>
      </widget>
@@ -251,8 +256,8 @@
    <slot>mainFunc_generatorRun()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>651</x>
-     <y>112</y>
+     <x>1224</x>
+     <y>83</y>
     </hint>
     <hint type="destinationlabel">
      <x>695</x>
@@ -260,9 +265,42 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_generatorStep</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>mainFunc_generatorStep()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1124</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>740</x>
+     <y>99</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_generatorReset</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>mainFunc_generatorReset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1004</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1270</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>mainFunc_generatorRun()</slot>
-  <slot>mainFunc_resetMaze()</slot>
+  <slot>mainFunc_generatorReset()</slot>
+  <slot>mainFunc_generatorStep()</slot>
  </slots>
 </ui>
