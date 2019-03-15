@@ -15,8 +15,9 @@ class MazeGenerator(object):
 
 		self.flag_stopGen = False		# Require to stop generator immediately, used before running a new generator
 		self.flag_skipGen = False		# Require to display final result immediately without showing intermediate result
-		self.event_stepGen = threading.Event()		# Require step generation
+		self.flag_stepGen = False		# Require step generation
 
+		self.event_stepGen = threading.Event()
 		self.lock_startGenerator = threading.Lock()		# Limit that at most one generator is active
 		self.lock_modifyFlag_stopGenerator = threading.Lock()
 
@@ -54,36 +55,47 @@ class MazeGenerator(object):
 			self.mazeData.isGenerated = True
 
 	def generatorReset(self, index: int, size: int):
-		pass
-
-	def generatorStep(self, index: int, size: int):
-		pass
-
-	def generatorRun(self, index: int, size: int):
-		pass
-
-	def generatorCreateAndRun(self, index: int, size: int):
 		with self.lock_modifyFlag_stopGenerator:
 			if self.flag_stopGen:		# Limit that only one generator can run
 				return
 			self.flag_stopGen = True
+			self.flag_stepGen = False
+			self.event_stepGen.set()
 
 		with self.lock_startGenerator:		# Maximum one active generator is allowed
 			# use with, the lock automatically acquire() at beginning and release() at the end
 			self.flag_stopGen = False
 			self.flag_skipGen = False
+			self.flag_stepGen = False
 			self.event_stepGen.clear()
 			with self.widget.lock_maze:
 				self.mazeData.size = size
 				self.resetMaze(index)
 
 			self.displayUpdate()
-			time.sleep(1)
 
+	def generatorStep(self, index: int, size: int):
+		if self.flag_stepGen:
+			self.event_stepGen.set()
+		else:
+			self.event_stepGen.clear()
+			self.flag_stepGen = True
+
+	def generatorRun(self, index: int, size: int):
+		with self.lock_startGenerator:
+			self.mazeData.isReset = False
 			self.generatorMappingList[index]()		# Call function by index
-
 			self.finishGenerating()
-		return
+
+	def generatorCreateAndRun(self, index: int, size: int):
+		self.generatorReset(index, size)
+		time.sleep(1)
+		self.generatorRun(index, size)
+
+	def stepCheckpoint(self):
+		if self.flag_stepGen:
+			self.event_stepGen.wait()
+			self.event_stepGen.clear()
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
 		def recursivebacktracking_dfs_helper(x, y, px, py):		# Helper function for DFS recursive calls
@@ -96,6 +108,7 @@ class MazeGenerator(object):
 
 			self.mazeData.block[x][y].color = MazeBlockColor.dark_cyan		# set current vertex to exact visiting state
 			self.displayUpdate()
+			self.stepCheckpoint()
 			self.mazeData.block[x][y].color = MazeBlockColor.cyan		# set vertex to visiting state
 			for (dir, (dx,dy)) in randomDeltaList:
 				nx = x + dx
@@ -109,9 +122,13 @@ class MazeGenerator(object):
 				self.mazeData.block[x][y].border[dir] = False
 				self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False		# Add edge by removing walls
 				recursivebacktracking_dfs_helper(nx, ny, x, y)
+				self.mazeData.block[x][y].color = MazeBlockColor.cyan		# set vertex to visiting state
 
 			self.mazeData.block[x][y].color = MazeBlockColor.white		# set vertex to fully visited state
+			if not self.isOutOfMaze(px, py):
+				self.mazeData.block[px][py].color = MazeBlockColor.dark_cyan
 			self.displayUpdate()
+			self.stepCheckpoint()
 
 		recursivebacktracking_dfs_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
 

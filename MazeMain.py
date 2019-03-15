@@ -29,10 +29,12 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 		th.start()
 
 	def mainFunc_generatorStep(self):
-		pass
+		th = threading.Thread(target=self.mazeGenerator.generatorStep, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+		th.start()
 
 	def mainFunc_generatorReset(self):
-		pass
+		th = threading.Thread(target=self.mazeGenerator.generatorReset, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+		th.start()
 
 if __name__ == "__main__":
 	sys.setrecursionlimit(10000)
