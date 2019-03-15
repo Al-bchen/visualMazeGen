@@ -28,6 +28,12 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 		th = threading.Thread(target=self.mazeGenerator.generatorCreateAndRun, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
 		th.start()
 
+	def mainFunc_generatorStep(self):
+		pass
+
+	def mainFunc_generatorReset(self):
+		pass
+
 if __name__ == "__main__":
 	sys.setrecursionlimit(10000)
 	threading.stack_size(128*1024*1024)
