@@ -21,6 +21,9 @@ class MazeGenerator(object):
 		self.lock_startGenerator = threading.Lock()		# Limit that at most one generator is active
 		self.lock_modifyFlag_stopGenerator = threading.Lock()
 
+		self.currentIndex = -1
+		self.currentSize = -1
+
 		self.generatorMappingList = [
 			self.generator_RecursiveBacktracking,
 			self.generator_Kruskal,
@@ -71,7 +74,8 @@ class MazeGenerator(object):
 			with self.widget.lock_maze:
 				self.mazeData.size = size
 				self.resetMaze(index)
-
+			self.currentIndex = index
+			self.currentSize = size
 			self.displayUpdate()
 
 	def generatorStep(self, index: int, size: int):
@@ -81,15 +85,26 @@ class MazeGenerator(object):
 			self.event_stepGen.clear()
 			self.flag_stepGen = True
 
-	def generatorRun(self, index: int, size: int):
-		with self.lock_startGenerator:
-			self.mazeData.isReset = False
-			self.generatorMappingList[index]()		# Call function by index
-			self.finishGenerating()
+	def generatorRun(self, index: int, size: int):		# Two cases of run: new running/stepping -> running
+		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
+			self.generatorResetAndRun(index, size)
+		elif self.mazeData.isReset:		# Maze already reset
+			with self.lock_startGenerator:
+				self.mazeData.isReset = False
+				self.generatorMappingList[index]()		# Call function by index
+				self.finishGenerating()
+		else:		# Maze is running
+			if self.flag_stepGen:		# Stepping, change to running
+				self.flag_stepGen = False
+				self.event_stepGen.set()
+			else:		# Running, change to stepping
+				self.event_stepGen.clear()
+				self.flag_stepGen = True
 
-	def generatorCreateAndRun(self, index: int, size: int):
-		self.generatorReset(index, size)
-		time.sleep(1)
+	def generatorResetAndRun(self, index: int, size: int):
+		if not self.mazeData.isReset or index != self.currentIndex or size != self.currentSize:
+			self.generatorReset(index, size)
+			time.sleep(1)
 		self.generatorRun(index, size)
 
 	def stepCheckpoint(self):
@@ -171,7 +186,7 @@ class MazeGenerator(object):
 			self.mazeData.block[x2][y2].color = MazeBlockColor.white
 			self.mazeData.block[x2][y2].border[MazeDirection.getOppositeDirDict()[dir]] = False
 			self.displayUpdate()
-			self.stepCheckPoint()
+			self.stepCheckpoint()
 
 	def generator_Prim(self):		# generator using Prim's Algorithm
 		adjacentVerticesSet = {(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))}
@@ -207,7 +222,7 @@ class MazeGenerator(object):
 						adjacentVerticesSet.add((nx, ny))
 
 			self.displayUpdate()
-			self.stepCheckPoint()
+			self.stepCheckpoint()
 
 	def generator_HuntAndKill(self):		# generator using Hunt Ant Kill
 		def huntandkill_iterate_helper(x, y):
