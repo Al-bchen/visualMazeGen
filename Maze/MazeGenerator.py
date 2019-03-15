@@ -101,7 +101,7 @@ class MazeGenerator(object):
 
 	def action_run(self, index: int, size: int):		# Two cases of run: new running/stepping -> running
 		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
-			self.action_resetandrun(index, size)
+			self.action_resetAndRun(index, size)
 		elif self.mazeData.isReset:		# Maze already reset
 			with self.lock_startGenerator:
 				self.mazeData.isReset = False

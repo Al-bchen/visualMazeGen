@@ -2,16 +2,17 @@
 
 # Form implementation generated from reading ui file 'MazeMainWindowUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1278, 789)
+        MainWindow.resize(1280, 800)
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -62,7 +63,7 @@ class Ui_MainWindow(object):
         self.pushButton_generatorRun = QtWidgets.QPushButton(self.widget_generatorSize)
         self.pushButton_generatorRun.setObjectName("pushButton_generatorRun")
         self.horizontalLayout_3.addWidget(self.pushButton_generatorRun)
-        self.horizontalLayout_3.setStretch(0, 10)
+        self.horizontalLayout_3.setStretch(0, 2)
         self.horizontalLayout_3.setStretch(1, 1)
         self.verticalLayout_3.addWidget(self.widget_generatorSize)
         self.widget_generatorPushButton = QtWidgets.QWidget(self.widget_generatorConfig)
@@ -79,6 +80,7 @@ class Ui_MainWindow(object):
         self.pushButton_generatorStep.setObjectName("pushButton_generatorStep")
         self.horizontalLayout_4.addWidget(self.pushButton_generatorStep)
         self.pushButton_generatorSkip = QtWidgets.QPushButton(self.widget_generatorPushButton)
+        self.pushButton_generatorSkip.setEnabled(False)
         self.pushButton_generatorSkip.setObjectName("pushButton_generatorSkip")
         self.horizontalLayout_4.addWidget(self.pushButton_generatorSkip)
         self.horizontalLayout_4.setStretch(0, 1)
@@ -148,5 +150,6 @@ class Ui_MainWindow(object):
         self.comboBox_solverMethod.setItemText(2, _translate("MainWindow", "Dijkstra Algorithm"))
         self.comboBox_solverMethod.setItemText(3, _translate("MainWindow", "A* Algorithm"))
         self.pushButton_solverRun.setText(_translate("MainWindow", "Run"))
+
 
 from MazeDisplay import MazeDisplay

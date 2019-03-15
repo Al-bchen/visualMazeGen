@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1278</width>
-    <height>789</height>
+    <width>1280</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="font">
@@ -79,7 +79,7 @@
           </property>
           <item>
            <widget class="QWidget" name="widget_generatorSize" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,1,0">
+            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1,0">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -165,6 +165,9 @@
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_generatorSkip">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="text">
                 <string>Skip</string>
                </property>
