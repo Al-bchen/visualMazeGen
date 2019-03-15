@@ -7,9 +7,10 @@ import copy
 from Maze.MazeBase import *
 from MazeDisplay import MazeDisplay
 
+
 class MazeGenerator(object):
 	def __init__(self):
-		super(MazeGenerator,self).__init__()
+		super(MazeGenerator, self).__init__()
 		self.mazeData = MazeData()
 		self.widget = MazeDisplay(None)
 
@@ -30,7 +31,7 @@ class MazeGenerator(object):
 			self.generator_Prim,
 			self.generator_HuntAndKill,
 			self.generator_RecursiveDivision
-		] 	# Map index to generator
+			] 	# Map index to generator
 
 	def setMaze(self, x: MazeData):
 		self.mazeData = x 	# shallow copy
@@ -54,12 +55,17 @@ class MazeGenerator(object):
 		if checkpoint:
 			self.stepCheckpoint()
 
-	def finishGenerating(self):
+	def stepCheckpoint(self):
+		if self.flag_stepGen:
+			self.event_stepGen.wait()
+			self.event_stepGen.clear()
+
+	def action_finishGeneration(self):
 		if not self.flag_stopGen:
 			self.widget.update()		# require immediate repaint
 			self.mazeData.isGenerated = True
 
-	def generatorReset(self, index: int, size: int):
+	def action_reset(self, index: int, size: int):
 		with self.lock_modifyFlag_stopGenerator:
 			if self.flag_stopGen:		# Limit that only one generator can run
 				return
@@ -80,9 +86,9 @@ class MazeGenerator(object):
 			self.currentSize = size
 			self.displayUpdate()
 
-	def generatorStep(self, index: int, size: int):
+	def action_step(self, index: int, size: int):
 		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
-			self.generatorReset(index, size)
+			self.action_reset(index, size)
 		elif self.lock_startGenerator.locked():
 			if self.flag_stepGen:
 				self.event_stepGen.set()
@@ -91,16 +97,16 @@ class MazeGenerator(object):
 				self.flag_stepGen = True
 		else:
 			self.flag_stepGen = True
-			self.generatorRun(index, size)
+			self.action_run(index, size)
 
-	def generatorRun(self, index: int, size: int):		# Two cases of run: new running/stepping -> running
+	def action_run(self, index: int, size: int):		# Two cases of run: new running/stepping -> running
 		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
-			self.generatorResetAndRun(index, size)
+			self.action_resetandrun(index, size)
 		elif self.mazeData.isReset:		# Maze already reset
 			with self.lock_startGenerator:
 				self.mazeData.isReset = False
 				self.generatorMappingList[index]()		# Call function by index
-				self.finishGenerating()
+				self.action_finishGeneration()
 		else:		# Maze is running
 			if self.flag_stepGen:		# Stepping, change to running
 				self.flag_stepGen = False
@@ -109,16 +115,14 @@ class MazeGenerator(object):
 				self.event_stepGen.clear()
 				self.flag_stepGen = True
 
-	def generatorResetAndRun(self, index: int, size: int):
-		if not self.mazeData.isReset or index != self.currentIndex or size != self.currentSize:
-			self.generatorReset(index, size)
-			time.sleep(1)
-		self.generatorRun(index, size)
+	def action_skip(self, index: int, size: int):
+		pass
 
-	def stepCheckpoint(self):
-		if self.flag_stepGen:
-			self.event_stepGen.wait()
-			self.event_stepGen.clear()
+	def action_resetAndRun(self, index: int, size: int):
+		if not self.mazeData.isReset or index != self.currentIndex or size != self.currentSize:
+			self.action_reset(index, size)
+			time.sleep(1)
+		self.action_run(index, size)
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
 		def recursivebacktracking_dfs_helper(x, y, px, py):		# Helper function for DFS recursive calls
@@ -296,10 +300,10 @@ class MazeGenerator(object):
 								self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False
 								ret = (x, y)		# found, assign return value and ready to return
 								break
-			self.displayUpdate()
+			self.displayUpdate(False)
 			return ret
 
-		huntandkill_iterate_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))
+		huntandkill_iterate_helper(random.randint(0, self.mazeData.size-1), random.randint(0, self.mazeData.size-1))
 		while True:
 			if self.flag_stopGen:
 				return

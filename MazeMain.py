@@ -14,7 +14,7 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 	def __init__(self):
 		super(MazeMainWindow, self).__init__()
 		self.setupUi(self)
-		self.centralwidget.parent().resize(800, 600)
+		self.centralwidget.parent().resize(1280, 800)
 
 		self.mazeData = MazeData(self.spinBox_mazeSize.value())
 
@@ -30,16 +30,19 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 		self.widget_mazeDisplayMain.update()
 
 	def mainFunc_generatorRun(self):
-		th = threading.Thread(target=self.mazeGenerator.generatorRun, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+		th = threading.Thread(target=self.mazeGenerator.action_run, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
 		th.start()
 
 	def mainFunc_generatorStep(self):
-		th = threading.Thread(target=self.mazeGenerator.generatorStep, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+		th = threading.Thread(target=self.mazeGenerator.action_step, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
 		th.start()
 
 	def mainFunc_generatorReset(self):
-		th = threading.Thread(target=self.mazeGenerator.generatorReset, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+		th = threading.Thread(target=self.mazeGenerator.action_reset, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
 		th.start()
+
+	def mainFunc_generatorSkip(self):
+		pass
 
 if __name__ == "__main__":
 	sys.setrecursionlimit(10000)
