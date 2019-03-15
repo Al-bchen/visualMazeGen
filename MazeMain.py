@@ -4,6 +4,7 @@ import threading
 
 from MazeMainWindowUI import Ui_MainWindow
 from Maze.MazeGenerator import MazeGenerator
+from Maze.MazeSolver import MazeSolver
 from Maze.MazeBase import MazeData
 
 from PyQt5.QtWidgets import QMainWindow, QApplication
@@ -20,6 +21,10 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
 		self.mazeGenerator = MazeGenerator()
 		self.mazeGenerator.setMaze(self.mazeData)
 		self.mazeGenerator.setWidget(self.widget_mazeDisplayMain)
+
+		self.mazeSolver = MazeSolver()
+		self.mazeSolver.setMaze(self.mazeData)
+		self.mazeSolver.setWidget(self.widget_mazeDisplayMain)
 
 		self.widget_mazeDisplayMain.mazeData = self.mazeData
 		self.widget_mazeDisplayMain.update()
