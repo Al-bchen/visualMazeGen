@@ -1,6 +1,15 @@
 # visualMazeGen
 Visualization on different algorithms of maze generation
 
+## Environment for building
+#### Windows / Mac
+- Python 3.6.8
+- PyQt 5.12
+#### Linux(Ubuntu)
+- Python 3.6.7
+- PyQt 5.12.1
+
+
 ## Current Progress
 
 ### Generator
@@ -19,6 +28,9 @@ Watch generation step by step
 
 ## Future Plan
 
+### Base
+- Migrate to Python 3.6.8 and PyQt 5.12.1 and test everything
+
 ### Generator
 - None
 
@@ -34,7 +46,6 @@ Watch generation step by step
 
 ### Parallel Generator
 - Depth First Search / Recursive Backtracking
-
 
 ### Solver
 - Depth First Search
