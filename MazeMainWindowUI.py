@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'MazeMainWindowUI.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -80,7 +80,7 @@ class Ui_MainWindow(object):
         self.pushButton_generatorStep.setObjectName("pushButton_generatorStep")
         self.horizontalLayout_4.addWidget(self.pushButton_generatorStep)
         self.pushButton_generatorSkip = QtWidgets.QPushButton(self.widget_generatorPushButton)
-        self.pushButton_generatorSkip.setEnabled(False)
+        self.pushButton_generatorSkip.setEnabled(True)
         self.pushButton_generatorSkip.setObjectName("pushButton_generatorSkip")
         self.horizontalLayout_4.addWidget(self.pushButton_generatorSkip)
         self.horizontalLayout_4.setStretch(0, 1)

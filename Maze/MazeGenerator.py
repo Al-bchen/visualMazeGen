@@ -48,14 +48,20 @@ class MazeGenerator(object):
 	def isOutOfMaze(self, x, y):
 		return x < 0 or x >= self.mazeData.size or y < 0 or y >= self.mazeData.size
 
-	def displayUpdate(self, checkpoint=True):
+	def resetAndRun(self, index: int, size: int):
+		if not self.mazeData.isReset or index != self.currentIndex or size != self.currentSize:
+			self.button_reset(index, size)
+			time.sleep(1)
+		self.button_run(index, size)
+
+	def action_displayUpdate(self, checkpoint=True):
 		if not self.flag_stopGen and not self.flag_skipGen:
 			time.sleep(0.01)
 			self.widget.update()
-		if checkpoint:
-			self.stepCheckpoint()
+			if checkpoint:
+				self.action_stepCheckpoint()
 
-	def stepCheckpoint(self):
+	def action_stepCheckpoint(self):
 		if self.flag_stepGen:
 			self.event_stepGen.wait()
 			self.event_stepGen.clear()
@@ -65,7 +71,7 @@ class MazeGenerator(object):
 			self.widget.update()		# require immediate repaint
 			self.mazeData.isGenerated = True
 
-	def action_reset(self, index: int, size: int):
+	def button_reset(self, index: int, size: int):
 		with self.lock_modifyFlag_stopGenerator:
 			if self.flag_stopGen:		# Limit that only one generator can run
 				return
@@ -84,24 +90,11 @@ class MazeGenerator(object):
 				self.resetMaze(index)
 			self.currentIndex = index
 			self.currentSize = size
-			self.displayUpdate()
+			self.action_displayUpdate()
 
-	def action_step(self, index: int, size: int):
+	def button_run(self, index: int, size: int):		# Two cases of run: new running/stepping -> running
 		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
-			self.action_reset(index, size)
-		elif self.lock_startGenerator.locked():
-			if self.flag_stepGen:
-				self.event_stepGen.set()
-			else:
-				self.event_stepGen.clear()
-				self.flag_stepGen = True
-		else:
-			self.flag_stepGen = True
-			self.action_run(index, size)
-
-	def action_run(self, index: int, size: int):		# Two cases of run: new running/stepping -> running
-		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
-			self.action_resetAndRun(index, size)
+			self.resetAndRun(index, size)
 		elif self.mazeData.isReset:		# Maze already reset
 			with self.lock_startGenerator:
 				self.mazeData.isReset = False
@@ -115,14 +108,31 @@ class MazeGenerator(object):
 				self.event_stepGen.clear()
 				self.flag_stepGen = True
 
-	def action_skip(self, index: int, size: int):
-		pass
+	def button_step(self, index: int, size: int):
+		if index != self.currentIndex or size != self.currentSize:		# Algorithm or size changed
+			self.button_reset(index, size)
+		elif self.lock_startGenerator.locked():
+			if self.flag_stepGen:
+				self.event_stepGen.set()
+			else:
+				self.event_stepGen.clear()
+				self.flag_stepGen = True
+		else:
+			self.flag_stepGen = True
+			self.button_run(index, size)
 
-	def action_resetAndRun(self, index: int, size: int):
-		if not self.mazeData.isReset or index != self.currentIndex or size != self.currentSize:
-			self.action_reset(index, size)
-			time.sleep(1)
-		self.action_run(index, size)
+	def button_skip(self, index: int, size: int):
+		if index != self.currentIndex or size != self.currentSize:  # Algorithm or size changed
+			self.button_reset(index, size)
+		else:
+			self.flag_skipGen = True
+			self.flag_stepGen = False
+			self.event_stepGen.set()
+			if self.mazeData.isReset:  # Maze already reset
+				with self.lock_startGenerator:
+					self.mazeData.isReset = False
+					self.generatorMappingList[index]()  # Call function by index
+					self.action_finishGeneration()
 
 	def generator_RecursiveBacktracking(self):		# generator using DFS
 		def recursivebacktracking_dfs_helper(x, y, px, py):		# Helper function for DFS recursive calls
@@ -134,7 +144,7 @@ class MazeGenerator(object):
 			random.shuffle(randomDeltaList)		# randomize direction selection
 
 			self.mazeData.block[x][y].color = MazeBlockColor.dark_cyan		# set current vertex to exact visiting state
-			self.displayUpdate()
+			self.action_displayUpdate()
 			self.mazeData.block[x][y].color = MazeBlockColor.cyan		# set vertex to visiting state
 			for (dir, (dx,dy)) in randomDeltaList:
 				nx = x + dx
@@ -153,7 +163,7 @@ class MazeGenerator(object):
 			self.mazeData.block[x][y].color = MazeBlockColor.white		# set vertex to fully visited state
 			if not self.isOutOfMaze(px, py):
 				self.mazeData.block[px][py].color = MazeBlockColor.dark_cyan
-			self.displayUpdate()
+			self.action_displayUpdate()
 
 		recursivebacktracking_dfs_helper(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1), -1, -1)		# call at here
 
@@ -195,7 +205,7 @@ class MazeGenerator(object):
 			self.mazeData.block[x1][y1].border[dir] = False
 			self.mazeData.block[x2][y2].color = MazeBlockColor.white
 			self.mazeData.block[x2][y2].border[MazeDirection.getOppositeDirDict()[dir]] = False
-			self.displayUpdate()
+			self.action_displayUpdate()
 
 	def generator_Prim(self):		# generator using Prim's Algorithm
 		adjacentVerticesSet = {(random.randint(0, self.mazeData.size-1),random.randint(0, self.mazeData.size-1))}
@@ -230,7 +240,7 @@ class MazeGenerator(object):
 						self.mazeData.block[nx][ny].color = MazeBlockColor.cyan
 						adjacentVerticesSet.add((nx, ny))
 
-			self.displayUpdate()
+			self.action_displayUpdate()
 
 	def generator_HuntAndKill(self):		# generator using Hunt Ant Kill
 		def huntandkill_iterate_helper(x, y):
@@ -242,7 +252,7 @@ class MazeGenerator(object):
 				random.shuffle(randomDeltaList)		# randomize direction selection
 
 				self.mazeData.block[x][y].color = MazeBlockColor.dark_cyan		# set current vertex to exact visiting state
-				self.displayUpdate()
+				self.action_displayUpdate()
 				self.mazeData.block[x][y].color = MazeBlockColor.cyan		# set vertex to visiting state
 
 				flag_deadend = True
@@ -267,7 +277,7 @@ class MazeGenerator(object):
 				for y in range(self.mazeData.size):
 					if self.mazeData.block[x][y].color == MazeBlockColor.cyan:
 						self.mazeData.block[x][y].color = MazeBlockColor.white
-			self.displayUpdate(checkpoint=False)
+			self.action_displayUpdate(checkpoint=False)
 
 		def huntandkill_scan_and_add_adjacent():		# scan(hunt) for the first unvisited vertex and add edge with adjacent visited vertex
 			ret = None
@@ -279,7 +289,7 @@ class MazeGenerator(object):
 				saved_column = copy.deepcopy(self.mazeData.block[x])		# save state
 				for y in range(self.mazeData.size):
 					self.mazeData.block[x][y].color = MazeBlockColor.green
-				self.displayUpdate()
+				self.action_displayUpdate()
 				self.mazeData.block[x] = saved_column		# restore state
 
 				for y in range(self.mazeData.size):
@@ -300,7 +310,7 @@ class MazeGenerator(object):
 								self.mazeData.block[nx][ny].border[MazeDirection.getOppositeDirDict()[dir]] = False
 								ret = (x, y)		# found, assign return value and ready to return
 								break
-			self.displayUpdate(False)
+			self.action_displayUpdate(False)
 			return ret
 
 		huntandkill_iterate_helper(random.randint(0, self.mazeData.size-1), random.randint(0, self.mazeData.size-1))
@@ -345,10 +355,10 @@ class MazeGenerator(object):
 				self.mazeData.block[x+dy][y+dx].border[MazeDirection.getOppositeDirDict()[dir]] = True
 				x = x + dx
 				y = y + dy
-			self.displayUpdate()
+			self.action_displayUpdate()
 			self.mazeData.block[passx][passy].border[dir] = False
 			self.mazeData.block[passx+dy][passy+dx].border[MazeDirection.getOppositeDirDict()[dir]] = False
-			self.displayUpdate()
+			self.action_displayUpdate()
 			if randomnumber <= width:		# vertical wall
 				recursivedivision_helper(x1, y1, wallx, y2)
 				recursivedivision_helper(wallx+1, y1, x2, y2)
