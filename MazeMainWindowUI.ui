@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1278</width>
-    <height>789</height>
+    <width>1280</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="font">
@@ -79,7 +79,7 @@
           </property>
           <item>
            <widget class="QWidget" name="widget_generatorSize" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="10,1">
+            <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="2,1,0">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -95,7 +95,7 @@
              <item>
               <widget class="QLabel" name="label_mazeSize">
                <property name="text">
-                <string>Maze size(5-50)</string>
+                <string>Maze size (5-50)</string>
                </property>
               </widget>
              </item>
@@ -118,12 +118,19 @@
                </property>
               </widget>
              </item>
+             <item>
+              <widget class="QPushButton" name="pushButton_generatorRun">
+               <property name="text">
+                <string>Run</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
           <item>
            <widget class="QWidget" name="widget_generatorPushButton" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,1">
+            <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="1,1,1">
              <property name="spacing">
               <number>7</number>
              </property>
@@ -157,9 +164,12 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_generatorRun">
+              <widget class="QPushButton" name="pushButton_generatorSkip">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
                <property name="text">
-                <string>Run</string>
+                <string>Skip</string>
                </property>
               </widget>
              </item>
@@ -256,8 +266,8 @@
    <slot>mainFunc_generatorRun()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1224</x>
-     <y>83</y>
+     <x>1255</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
      <x>695</x>
@@ -297,10 +307,27 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton_generatorSkip</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>mainFunc_generatorSkip()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1202</x>
+     <y>71</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1271</x>
+     <y>141</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>mainFunc_generatorRun()</slot>
   <slot>mainFunc_generatorReset()</slot>
   <slot>mainFunc_generatorStep()</slot>
+  <slot>mainFunc_generatorSkip()</slot>
  </slots>
 </ui>
