@@ -286,11 +286,12 @@ class MazeGenerator(object):
 					break
 				if self.flag_stopGen:
 					return None
-				saved_column = copy.deepcopy(self.mazeData.block[x])		# save state
-				for y in range(self.mazeData.size):
-					self.mazeData.block[x][y].color = MazeBlockColor.green
-				self.action_displayUpdate()
-				self.mazeData.block[x] = saved_column		# restore state
+				if not self.flag_skipGen:
+					saved_column = copy.deepcopy(self.mazeData.block[x])		# save state
+					for y in range(self.mazeData.size):
+						self.mazeData.block[x][y].color = MazeBlockColor.green
+					self.action_displayUpdate()
+					self.mazeData.block[x] = saved_column		# restore state
 
 				for y in range(self.mazeData.size):
 					if ret:
