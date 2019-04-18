@@ -10,6 +10,7 @@ from MazeDisplay import MazeDisplay
 
 class MazeSolver(object):
     def __init__(self):
+        super(MazeSolver, self).__init__()
         self.mazeData = MazeData()
         self.widget = MazeDisplay(None)
 
@@ -23,6 +24,8 @@ class MazeSolver(object):
         self.event_stepSolve = threading.Event()
 
         self.currentIndex = -1
+
+        self.solverMappingList = []
 
     def setMaze(self, x: MazeData):
         self.mazeData = x 	# shallow copy
@@ -60,8 +63,10 @@ class MazeSolver(object):
 
             self.action_displayUpdate()
 
-    def button_run(self):
-        pass
+    def button_run(self, index: int):
+        if self.mazeData.isGenerated:
+            with self.lock_startSolver:
+                pass
 
     def button_skip(self):
         pass
