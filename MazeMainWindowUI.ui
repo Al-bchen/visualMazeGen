@@ -198,11 +198,11 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="widget_selectSolveMethod" stretch="100,1">
+     <layout class="QHBoxLayout" name="widget_selectSolveMethod" stretch="100,0,0,1,0">
       <item>
        <widget class="QComboBox" name="comboBox_solverMethod">
         <property name="enabled">
-         <bool>false</bool>
+         <bool>true</bool>
         </property>
         <item>
          <property name="text">
@@ -227,12 +227,42 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_solverRun">
+       <widget class="QPushButton" name="pushButton_solverReset">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
+         <string>Reset</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_solverStep">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Step</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_solverRun">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
          <string>Run</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_solverRun_4">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Skip</string>
         </property>
        </widget>
       </item>
