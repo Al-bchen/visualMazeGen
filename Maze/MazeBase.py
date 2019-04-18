@@ -20,10 +20,10 @@ class MazeBlockData(object):
         self.text = ''
 
 
-class MazeDirection():
+class MazeDirection(object):
     @staticmethod
     def getDeltaList():
-        return [('u', (0,-1)), ('d', (0,1)), ('l', (-1,0)), ('r', (1,0))]
+        return [('u', (0, -1)), ('d', (0, 1)), ('l', (-1, 0)), ('r', (1, 0))]
 
     @staticmethod
     def getDeltaDict():
@@ -35,7 +35,7 @@ class MazeDirection():
 
     @staticmethod
     def getDeltaList_twoDir():
-        return [('d',(0,1)), ('r',(1,0))]
+        return [('d', (0, 1)), ('r', (1, 0))]
 
     @staticmethod
     def getDeltaDict_twoDir():
@@ -59,7 +59,7 @@ class MazeData(object):
         self.initMaze_grey()
 
     def initMaze_grey(self):
-        self.block = [[MazeBlockData() for i in range(self.size)] for j in range(self.size)]
+        self.block = [[MazeBlockData() for _i in range(self.size)] for _j in range(self.size)]
         for x in range(self.size):
             for y in range(self.size):
                 self.block[x][y].color = MazeBlockColor.grey
@@ -72,7 +72,7 @@ class MazeData(object):
         self.isSolving = False
 
     def initMaze_white(self):
-        self.block = [[MazeBlockData() for i in range(self.size)] for j in range(self.size)]
+        self.block = [[MazeBlockData() for _i in range(self.size)] for _j in range(self.size)]
         for i in range(self.size):
             self.block[i][0].border['u'] = True
             self.block[i][self.size - 1].border['d'] = True
