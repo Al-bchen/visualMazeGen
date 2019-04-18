@@ -30,19 +30,43 @@ class MazeMainWindow(QMainWindow, Ui_MainWindow):
         self.widget_mazeDisplayMain.update()
 
     def mainFunc_generatorRun(self):
-        th = threading.Thread(target=self.mazeGenerator.button_run, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+        if self.mazeData.isSolving:
+            return
+        th = threading.Thread(target=self.mazeGenerator.button_run,
+                              args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()],
+                              daemon=True)
         th.start()
 
     def mainFunc_generatorStep(self):
-        th = threading.Thread(target=self.mazeGenerator.button_step, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+        if self.mazeData.isSolving:
+            return
+        th = threading.Thread(target=self.mazeGenerator.button_step,
+                              args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()],
+                              daemon=True)
         th.start()
 
     def mainFunc_generatorReset(self):
-        th = threading.Thread(target=self.mazeGenerator.button_reset, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+        if self.mazeData.isSolving:
+            return
+        th = threading.Thread(target=self.mazeGenerator.button_reset,
+                              args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()],
+                              daemon=True)
         th.start()
 
     def mainFunc_generatorSkip(self):
-        th = threading.Thread(target=self.mazeGenerator.button_skip, args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()], daemon=True)
+        if self.mazeData.isSolving:
+            return
+        th = threading.Thread(target=self.mazeGenerator.button_skip,
+                              args=[self.comboBox_generatorMethod.currentIndex(), self.spinBox_mazeSize.value()],
+                              daemon=True)
+        th.start()
+
+    def mainFunc_solverRun(self):
+        if not self.mazeData.isGenerated:
+            return
+        th = threading.Thread(target=self.mazeSolver.button_run,
+                              args=[self.comboBox_solverMethod.currentIndex()],
+                              daemon=True)
         th.start()
 
 
