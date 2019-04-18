@@ -47,6 +47,7 @@ class MazeData(object):
         self.size = x
         self.isGenerated = False
         self.isReset = False
+        self.isSolving = False
         self.block = []
         self.initMaze()
 
@@ -68,6 +69,7 @@ class MazeData(object):
                     = self.block[x][y].border['r'] = True
         self.isGenerated = False
         self.isReset = True
+        self.isSolving = False
 
     def initMaze_white(self):
         self.block = [[MazeBlockData() for i in range(self.size)] for j in range(self.size)]
@@ -78,3 +80,4 @@ class MazeData(object):
             self.block[self.size - 1][i].border['r'] = True
         self.isGenerated = False
         self.isReset = True
+        self.isSolving = False
