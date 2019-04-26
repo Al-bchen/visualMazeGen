@@ -60,6 +60,11 @@
            <string>Recursive Division</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>Eller's Algorithm</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item>
