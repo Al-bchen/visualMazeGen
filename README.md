@@ -19,6 +19,7 @@ Visualization on different algorithms of maze generation
   - Prim's Algorithm (same edge weight)
 - Hunt And Kill
 - Recursive Division
+- Eller's Algorithm
 
 ### Solver
 On progress...
