@@ -282,6 +282,7 @@ class MazeGenerator(object):
 
         def huntandkill_scan_and_add_adjacent():		# scan(hunt) for the first unvisited vertex and add edge with adjacent visited vertex
             ret = None
+            self.action_displayUpdate()
             for _x in range(self.mazeData.size):
                 if ret:
                     break
@@ -385,9 +386,14 @@ class MazeGenerator(object):
                         for x2 in range(self.mazeData.size):  # O(N) here, can speed up to O(1) with disjoint set
                             if block_id[x2] in old_id:
                                     block_id[x2] = min(old_id)
+                            self.mazeData.block[x][y].color = MazeBlockColor.light_grey
+                            self.mazeData.block[x+1][y].color = MazeBlockColor.light_grey
                         self.mazeData.block[x][y].border['r'] = False
                         self.mazeData.block[x+1][y].border['l'] = False
                         self.action_displayUpdate()
+                        self.mazeData.block[x][y].color = MazeBlockColor.white
+                        self.mazeData.block[x+1][y].color = MazeBlockColor.white
+            self.action_displayUpdate()
             last_block_vertical_wall_removed = False
             block_id_next_row = [-1 for _ in range(self.mazeData.size)]
             set_id_vertical_connection = set()
@@ -396,23 +402,30 @@ class MazeGenerator(object):
                     last_block_vertical_wall_removed = False
                 elif not last_block_vertical_wall_removed and random.random() < 0.6:  # randomly join two vertical block
                     if not (y == self.mazeData.size - 2 and not block_id[x] in set_id_vertical_connection):
-                        last_block_vertical_wall_removed = True
+                        # last_block_vertical_wall_removed = True
                         set_id_vertical_connection.add(block_id[x])
                         self.mazeData.block[x][y].border['d'] = False
                         self.mazeData.block[x][y+1].border['u'] = False
+                        self.mazeData.block[x][y].color = MazeBlockColor.light_grey
+                        self.mazeData.block[x][y+1].color = MazeBlockColor.light_grey
                         block_id_next_row[x] = block_id[x]
                         self.action_displayUpdate()
+                        self.mazeData.block[x][y].color = MazeBlockColor.white
+                        self.mazeData.block[x][y+1].color = MazeBlockColor.white
                 else:
                     last_block_vertical_wall_removed = False
-
             for x in range(self.mazeData.size):  # add vertical connection for set that don't connected yet
                 if block_id[x] not in set_id_vertical_connection:
                     set_id_vertical_connection.add(block_id[x])
                     self.mazeData.block[x][y].border['d'] = False
                     self.mazeData.block[x][y+1].border['u'] = False
+                    self.mazeData.block[x][y].color = MazeBlockColor.light_grey
+                    self.mazeData.block[x][y+1].color = MazeBlockColor.light_grey
                     block_id_next_row[x] = block_id[x]
                     self.action_displayUpdate()
-
+                    self.mazeData.block[x][y].color = MazeBlockColor.white
+                    self.mazeData.block[x][y + 1].color = MazeBlockColor.white
+            self.action_displayUpdate()
             for x in range(self.mazeData.size):  # set block id for the next row
                 if block_id_next_row[x] == -1:
                     block_id[x] = (y+1) * self.mazeData.size + x
