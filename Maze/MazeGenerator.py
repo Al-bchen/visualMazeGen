@@ -400,7 +400,7 @@ class MazeGenerator(object):
             for x in range(self.mazeData.size):  # add vertical connection
                 if x == 0 or block_id[x] != block_id[x-1]:  # new block set, reset flag
                     last_block_vertical_wall_removed = False
-                elif not last_block_vertical_wall_removed and random.random() < 0.6:  # randomly join two vertical block
+                elif not last_block_vertical_wall_removed and random.random() < 0.5:  # randomly join two vertical block
                     if not (y == self.mazeData.size - 2 and not block_id[x] in set_id_vertical_connection):
                         # last_block_vertical_wall_removed = True
                         set_id_vertical_connection.add(block_id[x])
